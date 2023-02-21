@@ -10,41 +10,27 @@
         />
       </v-col>
 
-      <v-col class="mb-4">
+      <v-col class="mb-4" cols="12">
         <h1 class="display-2 font-weight-bold mb-3">
           Welcome to the COMP 3334!
         </h1>
-
-
-        <p class="subheading font-weight-regular">
-          For help and collaboration with other Vuetify developers,
-          <br>please join our online
-          <a
-            href="https://community.vuetifyjs.com"
-            target="_blank"
-          >Discord Community</a>
-        </p>
       </v-col>
 
-      <v-col
-        class="mb-5"
-        cols="12"
-      >
-        <h2 class="headline font-weight-bold mb-5">
-          <v-btn>elevated (default)</v-btn>
-        </h2>
+      <v-col class="mb-4" cols="12">
+        <h1 class="display-2 font-weight-bold mb-3">
+          <v-btn v-on:click="call1">Click me to test the Rest API</v-btn>
+          <v-banner>
+            <v-banner-text>
+              {{ label }}
+            </v-banner-text>
+          </v-banner>
+        </h1>
+      </v-col>
 
-        <v-row justify="center">
-          <a
-            v-for="(next, i) in whatsNext"
-            :key="i"
-            :href="next.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ next.text }}
-          </a>
-        </v-row>
+      <v-col class="mb-4">
+        <h1 class="display-2 font-weight-bold mb-3">
+          <v-btn v-on:click="call2">{{ label2  }}</v-btn>
+        </h1>
       </v-col>
 
       <v-col
@@ -68,26 +54,6 @@
         </v-row>
       </v-col>
 
-      <v-col
-        class="mb-5"
-        cols="12"
-      >
-        <h2 class="headline font-weight-bold mb-5">
-          Ecosystem
-        </h2>
-
-        <v-row justify="center">
-          <a
-            v-for="(eco, i) in ecosystem"
-            :key="i"
-            :href="eco.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ eco.text }}
-          </a>
-        </v-row>
-      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -98,6 +64,9 @@ export default {
   name: 'HelloWorld',
 
   data: () => ({
+    label: 'Banner with one line of text.',
+    label2: 'Lets test Json',
+
     ecosystem: [
       {
         text: 'vuetify-loader',
@@ -114,10 +83,6 @@ export default {
     ],
     importantLinks: [
       {
-        text: 'Chat',
-        href: 'https://community.vuetifyjs.com',
-      },
-      {
         text: 'Made with Vuetify',
         href: 'https://madewithvuejs.com/vuetify',
       },
@@ -129,8 +94,6 @@ export default {
         text: 'Articles',
         href: 'https://medium.com/vuetify',
       },
-    ],
-    whatsNext: [
       {
         text: 'Explore components',
         href: 'https://vuetifyjs.com',
@@ -145,5 +108,26 @@ export default {
       },
     ],
   }),
+
+  methods:{
+    call1(){
+      fetch("/api/messages/hello")
+      .then((response) => response.text())
+      .then((data) => {
+        this.label = data
+      });
+    },
+    call2(){
+      fetch("/api/messages/testList")
+      .then((response) => response.text())
+      .then((data) => {
+        alert(data)
+        var mydata = JSON.parse(data);
+        this.label = "Hi " + mydata[0].userName
+        this.label2 = "Hi " + mydata[1].userName
+      });
+    }
+  },
+
 }
 </script>
