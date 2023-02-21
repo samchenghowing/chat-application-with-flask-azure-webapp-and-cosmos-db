@@ -111,14 +111,14 @@ export default {
 
   methods:{
     call1(){
-      fetch("/api/messages/hello")
+      fetch("/api/v1/user/hello")
       .then((response) => response.text())
       .then((data) => {
         this.label = data
       });
     },
     call2(){
-      fetch("/api/messages/testList")
+      fetch("/api/v1/user/getAllUser")
       .then((response) => response.text())
       .then((data) => {
         alert(data)

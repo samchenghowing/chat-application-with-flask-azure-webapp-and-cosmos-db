@@ -1,8 +1,15 @@
 package com.example.demo;
 
-public class User {
-    int userID;
-    String userName;
+import javax.persistence.*;
+
+@Entity
+public class Person {
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private int userID;
+    private String userName;
+
     public int getUserID() {
         return userID;
     }
@@ -19,7 +26,12 @@ public class User {
     public String toString() {
         return "User [userID=" + userID + ", userName=" + userName + "]";
     }
-    public User(int userID, String userName) {
+    public Person() {
+    }
+    public Person(String userName) {
+        this.userName = userName;
+    }
+    public Person(int userID, String userName) {
         this.userID = userID;
         this.userName = userName;
     }
