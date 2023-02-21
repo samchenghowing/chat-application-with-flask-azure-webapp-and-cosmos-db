@@ -7,12 +7,25 @@ Spring Boot<br>
 JavaScript<br>
 VueJS<br>
 
-npm run serve
+create 2 terminals 
+
+first one:
+cd frontend
+
+npm run serve 
+
+
+second one (backend):
+cd demo
+
+mvn spring-boot:run
+
 
 brew install maven
 
 java -jar target/demo-0.0.1-SNAPSHOT.jar
 
+https://polyu-comp.gitbook.io/java-spring/spring-restful-api
 
 https://www.youtube.com/watch?v=PzXaFXgsp60
 
