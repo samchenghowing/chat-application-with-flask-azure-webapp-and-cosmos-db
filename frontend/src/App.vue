@@ -1,4 +1,5 @@
 <template>
+  
   <v-app>
     <v-main>
       <HelloWorld/>
@@ -8,7 +9,8 @@
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-
+import Home from './components/Home.vue';
+import account from './components/account.vue';
 export default {
   name: 'App',
 
