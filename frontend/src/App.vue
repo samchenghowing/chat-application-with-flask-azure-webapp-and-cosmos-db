@@ -1,8 +1,12 @@
+<!-- import { createRouter, createWebHistory } from 'vue-router' -->
+
 <template>
-  <nav>
+  <div id="nav">
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
+    <router-link to="/account">Account</router-link>
+    <router-link to="/chatPage">chatPage</router-link>
+    
+  </div>
   <router-view/>
 </template>
 
