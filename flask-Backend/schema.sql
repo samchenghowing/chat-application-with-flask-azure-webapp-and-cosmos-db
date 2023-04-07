@@ -6,3 +6,9 @@ CREATE TABLE posts (
     title TEXT NOT NULL,
     content TEXT NOT NULL
 );
+
+CREATE TABLE USER{
+    userName INTEGER PRIMARY KEY AUTOINCREMENT,
+    pw TEXT NOT NULL,
+    content TEXT NOT NULL
+}
