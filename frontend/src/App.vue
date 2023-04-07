@@ -1,5 +1,4 @@
 <template>
-  
   <v-app>
     <v-main>
       <HelloWorld/>
@@ -11,11 +10,15 @@
 import HelloWorld from './components/HelloWorld.vue'
 import Home from './components/Home.vue';
 import account from './components/account.vue';
+
 export default {
   name: 'App',
 
   components: {
     HelloWorld,
+    Home,
+    account,
+
   },
 
   data: () => ({
@@ -23,3 +26,8 @@ export default {
   }),
 }
 </script>
+<style>
+#app {
+  font-family: Arial, sans-serif;
+}
+</style>
