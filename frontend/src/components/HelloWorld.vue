@@ -90,14 +90,16 @@ export default {
       });
     },
     call2(){
-      fetch("/api/users")
-      .then((response) => response.text())
-      .then((data) => {
-        alert(data)
-        var mydata = JSON.parse(data);
-        this.label = "Hi " + mydata[0].userName
-        this.label2 = "Hi " + mydata[1].userName
-      });
+      // fetch("/api/users")
+      // .then((response) => response.text())
+      // .then((data) => {
+      //   alert(data)
+      //   var mydata = JSON.parse(data);
+      //   this.label = "Hi " + mydata[0].userName
+      //   this.label2 = "Hi " + mydata[1].userName
+      // });
+      router.push({ path: 'home' })
+
     },
     
   },
