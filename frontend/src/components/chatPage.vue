@@ -77,7 +77,8 @@ export default {
 .chat-messages {
   height: calc(100vh - 10rem);
   overflow-y: scroll;
-  padding: 1rem;
+  padding: 4px;
+  margin-bottom: 1rem;
 }
 
 .message {
@@ -106,21 +107,23 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 5rem;
-  background-color: #f2f2f2;
-  border-top: 1px solid #e2e2e2;
+  height: 20px;
+  /* background-color: #f2f2f2;
+  border-top: 1px solid #e2e2e2; */
 }
 
 .chat-input input {
   flex-grow: 1;
   margin-right: 1rem;
+  margin-left: 8px;
+  margin-bottom: 2px;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 0.25rem;
 }
 
 .chat-input button {
-  padding: 0.5rem;
+  padding: 20px;
   border: none;
   background-color: #333;
   color: white;
