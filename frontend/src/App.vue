@@ -4,8 +4,8 @@
   <div id="nav">
     <router-link to="/">Home</router-link> |
     <router-link to="/account">Account</router-link>
-    <router-link to="/chatPage">chatPage</router-link>
-    
+    <p></p>
+    <router-link to="/chatPage">Chat</router-link>
   </div>
   <router-view/>
 </template>

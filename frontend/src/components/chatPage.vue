@@ -1,5 +1,8 @@
 <template>
   <div>
+    <!-- <router-link to="/Home">Home</router-link> -->
+    <p></p>
+    <!-- <router-link to="/account">Account</router-link> -->
     <div class="chat-header">
       <h1>Chat</h1>
     </div>
@@ -27,13 +30,13 @@ export default {
       messages: [
         {
           id: 1,
-          author: "John Doe",
+          author: "Alice",
           timestamp: "12:01 PM",
           text: "Hey, how are you?",
         },
         {
           id: 2,
-          author: "Jane Smith",
+          author: "Bob",
           timestamp: "12:02 PM",
           text: "I'm doing well, thanks. How about you?",
         },
@@ -49,7 +52,7 @@ export default {
 
       const newMessage = {
         id: this.messages.length + 1,
-        author: "John Doe",
+        author: "Alice",
         timestamp: new Date().toLocaleTimeString(),
         text: this.messageText,
       };
