@@ -2,13 +2,24 @@
 
 <template>
   <div id="nav">
+    <Header />
     <router-link to="/">Home</router-link> |
     <router-link to="/account">Account</router-link>
     <p></p>
     <router-link to="/chatPage">Chat</router-link>
+    <router-view/>
   </div>
-  <router-view/>
 </template>
+
+<script>
+import Header from './components/header.vue'
+export default {
+  name: "HomePage",
+  components:{
+    Header
+  }
+};
+</script>
 
 <style>
 #app {
