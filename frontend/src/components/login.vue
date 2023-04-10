@@ -110,19 +110,21 @@ export default {
       });
     },
     login(){
-      // delay 1 second to slow down hacker
-
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: "Vue POST Request Example" })
-      };
-
-      fetch("/api/login")
-      .then((response) => response.text())
-      .then((data) => {
-        this.label = data
-      });
+      // TO-DO: delay 1 second to slow down hacker
+      if (this.userName.length > 3 && this.password.length > 8) {
+        fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            name: this.userName,
+            password: this.userName,
+          })
+        })
+        .then((response) => response.text())
+        .then((data) => {
+          this.label = data
+        })
+      }
     },
     
   },
