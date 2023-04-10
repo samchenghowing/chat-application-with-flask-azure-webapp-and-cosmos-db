@@ -117,7 +117,7 @@ export default {
     login(){
       // TO-DO: delay 1 second to slow down hacker
 
-      if (this.userName.length > 3 && this.password.length > 8) {
+      if (this.userName.length > 3 && this.password.length > 7) {
         // TO-DO: add salt
         var hash = CryptoJS.SHA256(this.password)
         console.log(hash.toString(CryptoJS.enc.Base64)); 
@@ -127,7 +127,7 @@ export default {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             name: this.userName,
-            password: hash,
+            password: hash.toString(CryptoJS.enc.Base64),
           })
         })
         .then((response) => response.text())

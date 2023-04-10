@@ -101,5 +101,5 @@ def login():
     return jsonify(json_data), 200
 
 if __name__ == "__main__":
-    # initLogger()
-    app.run(ssl_context='adhoc', host="0.0.0.0", port=8080, debug=True, use_reloader=False)   
+    # app.run(ssl_context='adhoc', host="0.0.0.0", port=8080, debug=True, use_reloader=False) 
+    app.run()  # run this on Azure App Service

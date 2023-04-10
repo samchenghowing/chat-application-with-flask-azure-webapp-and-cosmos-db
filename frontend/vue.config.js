@@ -12,7 +12,8 @@ module.exports = {
         port: 3000,
         proxy: {
             '/api': {
-                target: 'https://localhost:8080',
+                // target: 'https://localhost:8080',
+                target: 'https://icy-ocean-55c1ab97056148c38929dee989edc826.azurewebsites.net',
                 ws: true,
                 changeOrigin: true
             }
