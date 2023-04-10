@@ -24,6 +24,9 @@
   
 <script>
 export default {
+  mounted() {
+    // TO-DO: if not logged in, route back to home
+  },
   name: "ChatPage",
   data() {
     return {

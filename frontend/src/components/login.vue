@@ -76,9 +76,14 @@
 </template>
 
 <script>
+import CryptoJS from 'crypto-js';
 
 export default {
-
+  // https://stackoverflow.com/questions/66597118/undefined-cryptojs-in-vue
+  created() {
+  //   var bytes  = CryptoJS.AES.decrypt(ciphertext, 'secret key 123');
+  //   var originalText = bytes.toString(CryptoJS.enc.Utf8);
+  },
   data: () => ({
     label: 'Banner with one line of text.',
     label2: 'back to main page',
@@ -111,13 +116,18 @@ export default {
     },
     login(){
       // TO-DO: delay 1 second to slow down hacker
+
       if (this.userName.length > 3 && this.password.length > 8) {
+        // TO-DO: add salt
+        var hash = CryptoJS.SHA256(this.password)
+        console.log(hash.toString(CryptoJS.enc.Base64)); 
+        
         fetch("/api/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             name: this.userName,
-            password: this.userName,
+            password: hash,
           })
         })
         .then((response) => response.text())

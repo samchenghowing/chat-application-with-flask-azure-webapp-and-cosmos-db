@@ -80,14 +80,15 @@ def login():
 
         if IPDict[request.remote_addr][0] == 5:
             json_data = [{"login":False, "attempt count": IPDict[request.remote_addr][0], 
-                          request.remote_addr: "This IP is blocked for 1 minutes since too many\
-                             failed login attempts were made"}]
+                          request.remote_addr: "This IP is blocked 1 minutes since too many\
+                             failed login attempts"}]
             return jsonify(json_data), 200
         IPDict[request.remote_addr][0] = IPDict[request.remote_addr][0] + 1
 
     name = json_data['name']
     password = json_data['password']
 
+    # TO-DO: avoid sql injection
     conn = get_db_connection()
     # conn.execute('INSERT INTO posts (title, content) VALUES (?, ?)',
     #                 (title, content))
