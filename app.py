@@ -1,15 +1,36 @@
 from datetime import date, datetime, timedelta
 import logging
 import os
-import socket
-from flask import Flask,request,jsonify
 import sqlite3
-import hashlib
+from flask import Flask,request,jsonify
+from flask_wtf.csrf import CSRFProtect
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
 
 # Client IPDict
 IPDict = {}
 
+# https://testdriven.io/blog/csrf-flask/
 app = Flask(__name__)
+app.config.update(
+    DEBUG=True,
+    SECRET_KEY="COMP3334group30",
+)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+csrf = CSRFProtect()
+csrf.init_app(app)
+
+
 
 def initLogger():
     """Create a logger and log file named with today's day + connectionLog.txt """
@@ -56,14 +77,19 @@ def main():
     conn.close()
     return str(posts) 
 
-@app.route('/api/about')
-def about():
-    return 'I am '+socket.gethostname()
-
 @app.route('/api/users')
 def get_users():
     json_data = [{"name":"alice","age":18},{"name":"bob", "age": 22}]
     return jsonify(json_data),200
+
+@app.route('/api/signup', methods=['POST'])
+def signup():
+    json_data = request.get_json()
+    print(json_data)
+
+    name = json_data['name']
+    password = json_data['password']
+
 
 @app.route('/api/login', methods=['POST'])
 def login():
