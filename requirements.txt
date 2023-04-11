@@ -16,5 +16,3 @@ numpy==1.21.4
 ordereddict==1.1
 pyOpenSSL==23.1.1
 tornado==6.2
-xmlrpclib==1.0.1
-zipp==3.15.0
