@@ -2,6 +2,7 @@
 
 Used technologies:
 Vue.js
+
 Python flask
 
 <https://www.youtube.com/watch?v=PzXaFXgsp60>

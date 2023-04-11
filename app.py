@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+import hashlib
 import logging
 import os
 import sqlite3
@@ -15,21 +16,16 @@ app.config.update(
     SECRET_KEY="COMP3334group30",
 )
 
-def initLogger():
-    """Create a logger and log file named with today's day + connectionLog.txt """
-    today = date.today()
-    if not os.path.exists("Logs"):
-        os.makedirs("Logs")
-    logging.basicConfig(filename=f'Logs/{today.strftime("%d%m%y") + "connectionLog.txt"}',
-                        filemode='a',
-                        format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                        datefmt='%H:%M:%S',
-                        level=logging.DEBUG)
-    logging.getLogger('server').info("The logger is initialized")
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = dict_factory
     return conn
 
 def calculation_hash(password, salt, pepper="G30", iteration=1):
@@ -55,15 +51,16 @@ def calculation_hash(password, salt, pepper="G30", iteration=1):
 
 @app.route("/")
 def main():
-    # conn = get_db_connection()
-    # posts = conn.execute('SELECT * FROM posts').fetchall()
-    # conn.close()
     return "Wellcome to COMP3334 Backend!" 
 
 @app.route('/api/users')
 def get_users():
-    json_data = [{"name":"alice","age":18},{"name":"bob", "age": 22}]
-    return jsonify(json_data),200
+    conn = get_db_connection()
+    users = conn.execute('SELECT * FROM users').fetchall()
+    conn.close()
+    print(users)
+    
+    return users, 200
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
