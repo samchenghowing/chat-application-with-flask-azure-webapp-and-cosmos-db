@@ -3,16 +3,7 @@ import logging
 import os
 import sqlite3
 from flask import Flask,request,jsonify
-from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import (
-    LoginManager,
-    UserMixin,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
 
 # Client IPDict
 IPDict = {}
@@ -23,14 +14,6 @@ app.config.update(
     DEBUG=True,
     SECRET_KEY="COMP3334group30",
 )
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-csrf = CSRFProtect()
-csrf.init_app(app)
-
-
 
 def initLogger():
     """Create a logger and log file named with today's day + connectionLog.txt """
@@ -72,10 +55,10 @@ def calculation_hash(password, salt, pepper="G30", iteration=1):
 
 @app.route("/")
 def main():
-    conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM posts').fetchall()
-    conn.close()
-    return str(posts) 
+    # conn = get_db_connection()
+    # posts = conn.execute('SELECT * FROM posts').fetchall()
+    # conn.close()
+    return "Wellcome to COMP3334 Backend!" 
 
 @app.route('/api/users')
 def get_users():
