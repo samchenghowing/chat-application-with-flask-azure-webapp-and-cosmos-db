@@ -5,7 +5,7 @@
 
         <v-col class="mb-4" cols="12">
           <h1 class="display-2 font-weight-bold mb-3">
-            Login
+            Signup
           </h1>
           <v-sheet width="300" class="mx-auto">
             <v-form fast-fail @submit.prevent>
@@ -24,16 +24,16 @@
                 counter
               ></v-text-field>
 
-              <v-btn 
-                type="submit" 
-                block class="mt-2" 
-                :loading="loading"
-                v-on:click="login"
-                >Login
-                <template v-slot:loader>
-                  <v-progress-linear indeterminate></v-progress-linear>
-                </template>
-              </v-btn>
+              <v-text-field
+                v-model="confirmPassword"
+                :rules="passwordRules"
+                :type="'password'"
+                label="confirm Password"
+                hint="At least 8 characters"
+                counter
+              ></v-text-field>
+
+              <v-btn type="submit" block class="mt-2" v-on:click="login">Login</v-btn>
             </v-form>
           </v-sheet>
         </v-col>
@@ -53,31 +53,7 @@
           <h1 class="display-2 font-weight-bold mb-3">
             <v-btn v-on:click="$router.push('/')">Back to home</v-btn>
           </h1>
-          <v-btn
-            @click="snackbar = true"
-          >
-            Open Snackbar
-          </v-btn>
         </v-col>
-
-
-        <div class="text-center ma-2">
-          <v-snackbar
-            v-model="snackbar"
-          >
-            {{ text }}
-
-            <template v-slot:actions>
-              <v-btn
-                color="pink"
-                variant="text"
-                @click="snackbar = false"
-              >
-                Close
-              </v-btn>
-            </template>
-          </v-snackbar>
-        </div>
 
       </v-row>
     </v-container>
@@ -85,6 +61,7 @@
 </template>
 
 <script>
+
 import CryptoJS from 'crypto-js';
 
 export default {
@@ -97,7 +74,6 @@ export default {
     label: 'Banner with one line of text.',
     label2: 'back to main page',
     snackbar: false,
-    loading: false,
     text: `Hello, I'm a snackbar`,
     userName: '',
     password: '',
@@ -113,14 +89,8 @@ export default {
         return true
       },
     ],
-  }),
-  watch: {
-    loading (val) {
-      if (!val) return
 
-      setTimeout(() => (this.loading = false), 2000)
-    },
-  },
+  }),
 
   methods:{
     call1(){
@@ -134,8 +104,6 @@ export default {
       // TO-DO: delay 1 second to slow down hacker
 
       if (this.userName.length > 3 && this.password.length > 7) {
-        this.loading = true
-
         // TO-DO: add salt
         var hash = CryptoJS.SHA256(this.password)
         console.log(hash.toString(CryptoJS.enc.Base64)); 
@@ -151,9 +119,6 @@ export default {
         .then((response) => response.text())
         .then((data) => {
           this.label = data
-          // if is vaild user
-          sessionStorage.setItem('isAuth', 'true');
-          $router.push('/account')
         })
       }
     },

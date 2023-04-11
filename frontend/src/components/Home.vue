@@ -12,7 +12,7 @@
     <p>Here you can chat with your classmates in real-time.</p>
     <router-link to="/login">Log In</router-link>
     <p></p>
-    <router-link to="/signIn">Sign In</router-link>
+    <router-link to="/signup">Sign Up</router-link>
   </div>
 </template>
 
