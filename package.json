@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "vue-recaptcha": "^3.0.0-alpha.4"
+  }
+}
