@@ -69,6 +69,15 @@ def signup():
 
     name = json_data['name']
     password = json_data['password']
+    hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    
+    conn = get_db_connection()
+    conn.execute("INSERT INTO users (name, pwHash) VALUES (?, ?)",
+                (name, hash)
+                )
+    users = conn.execute('SELECT * FROM users').fetchall()
+    conn.close()
+    return users, 200
 
 
 @app.route('/api/login', methods=['POST'])

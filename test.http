@@ -1,0 +1,11 @@
+POST  http://localhost:5000/api/signup
+Content-Type: application/json
+
+{"name": "Bob","password": "bob'spw"}
+
+HTTP/1.1 200  - OK
+server: Werkzeug/2.2.3 Python/3.9.5
+date: Wed, 12 Apr 2023 01:25:33 GMT
+content-type: application/json
+content-length: 325
+connection: close
