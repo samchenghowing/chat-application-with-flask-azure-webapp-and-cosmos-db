@@ -92,7 +92,8 @@ export default {
 
   methods:{
     call1(){
-      fetch("/api/about")
+      var aboutAPI = process.env.VUE_APP_API_URL + "/about"   
+      fetch(aboutAPI)
       .then((response) => response.text())
       .then((data) => {
         this.label = data
@@ -113,14 +114,14 @@ export default {
 
         // TO-DO: add salt
         var hash = CryptoJS.SHA256(this.password)
-        console.log(hash.toString(CryptoJS.enc.Base64)); 
         
-        fetch("/api/login", {
+        var signupAPI = process.env.VUE_APP_API_URL + "/signup"   
+        fetch(signupAPI, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             name: this.userName,
-            password: hash.toString(CryptoJS.enc.Base64),
+            password: this.password,
           })
         })
         .then((response) => response.text())

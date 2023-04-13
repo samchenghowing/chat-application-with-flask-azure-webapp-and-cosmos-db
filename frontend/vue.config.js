@@ -7,18 +7,7 @@ module.exports = defineConfig({
     }
 })
 module.exports = {
-    // https://cli.vuejs.org/config/#devserver-proxy
-    devServer: {
-        port: 3000,
-        proxy: {
-            '/api': {
-                // target: 'https://localhost:8080',
-                target: 'https://icy-ocean-55c1ab97056148c38929dee989edc826.azurewebsites.net',
-                ws: true,
-                changeOrigin: true
-            }
-        }
-    },
+    publicPath: process.env.NODE_ENV === "production" ? "/COMP3334/" : "/",
 
     pluginOptions: {
       vuetify: {}

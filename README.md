@@ -1,5 +1,8 @@
 # COMP3334
 
+Here is the showcase of the frontend:
+<https://samchenghowing.github.io/COMP3334/#/>
+
 Used technologies:
 Frontend: Vue.js
 
@@ -23,8 +26,8 @@ pip install -r requirements.txt
 flask run
 ```
 
-When new code is pushed to the master branch, it will be deploy automatically to the Azure App Service on 
-<https://icy-ocean-55c1ab97056148c38929dee989edc826.azurewebsites.net/>
+When new code is pushed to the master branch, it will be deploy automatically to the Azure App Service hosting on <https://icy-ocean-55c1ab97056148c38929dee989edc826.azurewebsites.net/>
+
 Please check the Actions to check the status of current deployment.
 
 ### Reference videoes:
