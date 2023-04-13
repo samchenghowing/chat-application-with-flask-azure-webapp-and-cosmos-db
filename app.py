@@ -9,6 +9,7 @@ IPDict = {}
 
 # https://testdriven.io/blog/csrf-flask/
 app = Flask(__name__)
+cors = CORS(app)
 app.config.update(
     DEBUG=True,
     SECRET_KEY="6Lf-EIAlAAAAAFCP9I3fVD2WWIAlxYGQKxzUbSly",
