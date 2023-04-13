@@ -64,8 +64,8 @@ def signup():
 
     hash = generate_password_hash(password)
     print(hash)
-    conn.execute("INSERT INTO users (name, pwHash) VALUES (?, ?)",
-                (name, hash)
+    conn.execute("INSERT INTO users (name, pwHash, email, confirmed) VALUES (?, ?, ?, ?)",
+                (name, hash, "aaaa@com", 0)
                 )
     
 

@@ -13,6 +13,6 @@ CREATE TABLE users (
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NAME TEXT NOT NULL,
     pwHash TEXT NOT NULL,
-    email TEXT NOT NULL,
-    confirmed INTEGER NOT NULL,
+    email TEXT,
+    confirmed INTEGER
 );
