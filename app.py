@@ -1,7 +1,4 @@
-from datetime import date, datetime, timedelta
-import hashlib
-import logging
-import os
+from datetime import datetime, timedelta
 import sqlite3
 from flask import Flask,request,jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,7 +10,7 @@ IPDict = {}
 app = Flask(__name__)
 app.config.update(
     DEBUG=True,
-    SECRET_KEY="COMP3334group30",
+    SECRET_KEY="6Lf-EIAlAAAAAFCP9I3fVD2WWIAlxYGQKxzUbSly",
 )
 
 def dict_factory(cursor, row):
@@ -22,32 +19,10 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
-
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = dict_factory
     return conn
-
-def calculation_hash(password, salt, pepper="G30", iteration=1):
-    # Inputs
-    # password is the user's password in plain text
-    # salt is the unique salt per user and is randomly generated, store in database
-    # pepper is the common pepper for all users and is randomly generated, store in application.
-    # iteration is the number of iterations
-
-    # Output:
-    # The password hash
-    # Hash = sha512(salt+password+pepper)
-    # As long as iteration is greater than 0
-    # hash = sha512(hash)
-    # Decrement iteration
-    inStr = password + salt + pepper
-
-    while iteration > 0:
-        hash = hashlib.sha256(inStr.encode('utf-8')).hexdigest()
-        iteration = iteration - 1
-
-    return hash
 
 @app.route("/")
 def main():
@@ -58,34 +33,51 @@ def get_users():
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM users').fetchall()
     conn.close()
-    print(users)
-    
+
     return users, 200
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
     json_data = request.get_json()
-    print(json_data)
 
     name = json_data['name']
     password = json_data['password']
-    hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
-    
+
+
+    # TO-DO: avoid sql injection
+
+    # check if user exist in database
     conn = get_db_connection()
+    sql_select_query = """select * from users where name = ?"""
+    res = conn.execute(sql_select_query, (name,)).fetchone()
+    if res is not None:
+        json_data = [{"signup":False, "Status": "User alreafy exist in database!"}]
+        return jsonify(json_data), 200
+
+    # TO-DO: email verify
+
+
+
+    hash = generate_password_hash(password)
+    print(hash)
     conn.execute("INSERT INTO users (name, pwHash) VALUES (?, ?)",
                 (name, hash)
                 )
-    users = conn.execute('SELECT * FROM users').fetchall()
+    
+
+    conn.commit()
+    # users = conn.execute('SELECT * FROM users').fetchall()
     conn.close()
-    return users, 200
+
+    json_data = [{"signup":True}]
+    return jsonify(json_data), 200
 
 
 @app.route('/api/login', methods=['POST'])
 def login():
     json_data = request.get_json()
-    print(json_data)
 
-
+    # check if brute force trying password to login
     if request.remote_addr not in IPDict:
         IPDict[request.remote_addr] = [0, datetime.now()]
     else:
@@ -94,27 +86,50 @@ def login():
             IPDict[request.remote_addr] = [0, datetime.now()]
 
         if IPDict[request.remote_addr][0] == 5:
-            json_data = [{"login":False, "attempt count": IPDict[request.remote_addr][0], 
-                          request.remote_addr: "This IP is blocked 1 minutes since too many\
-                             failed login attempts"}]
+            json_data = [{"login":False, "from client": request.remote_addr, 
+                          "attempt count": IPDict[request.remote_addr][0], 
+                          "Status": "This IP is blocked 1 minutes since too many\
+                                    failed login attempts"}]
             return jsonify(json_data), 200
         IPDict[request.remote_addr][0] = IPDict[request.remote_addr][0] + 1
 
     name = json_data['name']
     password = json_data['password']
 
-    # TO-DO: avoid sql injection
-    conn = get_db_connection()
-    # conn.execute('INSERT INTO posts (title, content) VALUES (?, ?)',
-    #                 (title, content))
 
-    conn.commit()
+    # TO-DO: avoid sql injection
+
+    conn = get_db_connection()
+    sql_select_query = """select * from users where name = ?"""
+    user = conn.execute(sql_select_query, (name,)).fetchone()
     conn.close()
 
-    json_data = [{"login":True, "from client": request.remote_addr,
-                  "attempt count": IPDict[request.remote_addr]}]
-    return jsonify(json_data), 200
+    if user is None:
+        json_data = [{"login":False,"from client": request.remote_addr,
+                        "attempt count": IPDict[request.remote_addr],
+                        "Status": "User not exist in database!"}]
+        return jsonify(json_data), 200
+
+    hashedpw = user.get('pwHash')
+    if check_password_hash(hashedpw, password):
+        json_data = [{"login":True, "from client": request.remote_addr,
+                    "attempt count": IPDict[request.remote_addr], "User info": user}]
+        return jsonify(json_data), 200
+    else:
+        json_data = [{"login":False, "from client": request.remote_addr,
+                    "attempt count": IPDict[request.remote_addr], "Status": "password not match"}]
+        return jsonify(json_data), 200
+
+
+@app.route('/api/confirm/<token>')
+def confirm_email():
+    conn = get_db_connection()
+    users = conn.execute('SELECT * FROM users').fetchall()
+    conn.close()
+    
+    return users, 200
+
 
 if __name__ == "__main__":
-    # app.run(ssl_context='adhoc', host="0.0.0.0", port=8080, debug=True, use_reloader=False) 
-    app.run()  # run this on Azure App Service
+    app.run(ssl_context='adhoc', host="0.0.0.0", port=8080, debug=True, use_reloader=False) 
+    # app.run()  # run this on Azure App Service

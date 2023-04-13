@@ -21,7 +21,6 @@
                 :type="'password'"
                 label="Password"
                 hint="At least 8 characters"
-                counter
               ></v-text-field>
 
               <v-text-field
@@ -30,7 +29,6 @@
                 :type="'password'"
                 label="confirm Password"
                 hint="At least 8 characters"
-                counter
               ></v-text-field>
 
               <v-btn type="submit" block class="mt-2" v-on:click="login">Login</v-btn>
@@ -40,7 +38,7 @@
 
         <v-col class="mb-4" cols="12">
           <h1 class="display-2 font-weight-bold mb-3">
-            <v-btn v-on:click="call1">Test backend connection</v-btn>
+            <v-btn v-on:click="recaptcha">Test backend connection</v-btn>
             <v-banner>
               <v-banner-text>
                 {{ label }}
@@ -100,10 +98,19 @@ export default {
         this.label = data
       });
     },
+    recaptcha() {
+      this.$recaptcha('login').then((token) => {
+        console.log(token) // Will print the token
+      })
+    },
     login(){
       // TO-DO: delay 1 second to slow down hacker
 
       if (this.userName.length > 3 && this.password.length > 7) {
+        this.$recaptcha('login').then((token) => {
+          console.log(token) // Will print the token
+        })
+
         // TO-DO: add salt
         var hash = CryptoJS.SHA256(this.password)
         console.log(hash.toString(CryptoJS.enc.Base64)); 

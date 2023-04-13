@@ -1,11 +1,29 @@
+/*
+This file can help you to test the api locally by installing the httpBook extensions in VScode.
+*/
 POST  http://localhost:5000/api/signup
 Content-Type: application/json
 
-{"name": "Bob","password": "bob'spw"}
+{"name": "Sam","password": "bob'spw"}
 
 HTTP/1.1 200  - OK
 server: Werkzeug/2.2.3 Python/3.9.5
-date: Wed, 12 Apr 2023 01:25:33 GMT
+date: Wed, 12 Apr 2023 13:51:53 GMT
 content-type: application/json
-content-length: 325
+content-length: 18
 connection: close
+###
+POST  http://localhost:5000/api/login
+Content-Type: application/json
+
+{"name": "Sam","password": "bob'spw", "SECRET_KEY": "COMP3334group30Spring2023"}
+
+HTTP/1.1 200  - OK
+server: Werkzeug/2.2.3 Python/3.9.5
+date: Wed, 12 Apr 2023 13:52:01 GMT
+content-type: application/json
+content-length: 275
+connection: close
+/*
+
+*/
