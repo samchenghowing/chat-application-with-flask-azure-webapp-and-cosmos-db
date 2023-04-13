@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import sqlite3
 from flask import Flask,request,jsonify
+from flask_cors import CORS, cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Client IPDict
@@ -11,6 +12,7 @@ app = Flask(__name__)
 app.config.update(
     DEBUG=True,
     SECRET_KEY="6Lf-EIAlAAAAAFCP9I3fVD2WWIAlxYGQKxzUbSly",
+    CORS_HEADERS='Content-Type',
 )
 
 def dict_factory(cursor, row):
@@ -29,6 +31,7 @@ def main():
     return "Wellcome to COMP3334 Backend!" 
 
 @app.route('/api/users')
+@cross_origin()
 def get_users():
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM users').fetchall()
@@ -37,6 +40,7 @@ def get_users():
     return users, 200
 
 @app.route('/api/signup', methods=['POST'])
+@cross_origin()
 def signup():
     json_data = request.get_json()
 
@@ -74,6 +78,7 @@ def signup():
 
 
 @app.route('/api/login', methods=['POST'])
+@cross_origin()
 def login():
     json_data = request.get_json()
 
@@ -122,6 +127,7 @@ def login():
 
 
 @app.route('/api/confirm/<token>')
+@cross_origin()
 def confirm_email():
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM users').fetchall()

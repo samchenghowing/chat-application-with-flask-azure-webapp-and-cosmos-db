@@ -16,3 +16,4 @@ numpy==1.21.4
 ordereddict==1.1
 pyOpenSSL
 tornado==6.2
+flask-cors
