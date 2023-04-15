@@ -1,29 +1,29 @@
 /*
-This file can help you to test the api locally by installing the httpBook extensions in VScode.
+This file can help you to test the api locally by installing the httpBook extensions in VScode. 
+The password of Alice is 12345678.
 */
 POST  http://localhost:5000/api/signup
 Content-Type: application/json
 
-{"name": "Sam","password": "bob'spw"}
+{"name": "Alice","password": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="}
 
 HTTP/1.1 200  - OK
-server: Werkzeug/2.2.3 Python/3.9.5
-date: Wed, 12 Apr 2023 13:51:53 GMT
+server: Werkzeug/2.2.2 Python/3.9.5
+date: Thu, 13 Apr 2023 08:58:52 GMT
 content-type: application/json
 content-length: 18
+access-control-allow-origin: *
 connection: close
 ###
 POST  http://localhost:5000/api/login
 Content-Type: application/json
 
-{"name": "Sam","password": "bob'spw", "SECRET_KEY": "COMP3334group30Spring2023"}
+{"name": "Alice","password": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8=", "SECRET_KEY": "COMP3334group30Spring2023"}
 
 HTTP/1.1 200  - OK
-server: Werkzeug/2.2.3 Python/3.9.5
-date: Wed, 12 Apr 2023 13:52:01 GMT
+server: Werkzeug/2.2.2 Python/3.9.5
+date: Sat, 15 Apr 2023 13:15:22 GMT
 content-type: application/json
-content-length: 275
+content-length: 190
+access-control-allow-origin: *
 connection: close
-/*
-
-*/

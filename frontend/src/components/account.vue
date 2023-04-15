@@ -35,10 +35,15 @@
   <script>
 export default {
   name: "AccountPage",
+  mounted(){
+    var obj = JSON.parse(sessionStorage.user)
+    this.fullName = obj["User info"]["name"]
+    this.email = obj["User info"]["email"]
+  },
   data() {
     return {
-      fullName: "xxx",
-      email: "abcd@1234567890.com",
+      fullName: '',
+      email: '',
       profilePicture: "https://via.placeholder.com/150",
     };
   },

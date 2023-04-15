@@ -17,3 +17,4 @@ ordereddict==1.1
 pyOpenSSL
 tornado==6.2
 flask-cors
+Flask-reCaptcha==0.4.2

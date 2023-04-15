@@ -38,44 +38,11 @@
           </v-sheet>
         </v-col>
 
-        <v-col class="mb-4" cols="12">
-          <h1 class="display-2 font-weight-bold mb-3">
-            <v-btn v-on:click="call1">Test backend connection</v-btn>
-            <v-banner>
-              <v-banner-text>
-                {{ label }}
-              </v-banner-text>
-            </v-banner>
-          </h1>
-        </v-col>
-
-        <v-col class="mb-4">
-          <h1 class="display-2 font-weight-bold mb-3">
-            <v-btn v-on:click="$router.push('/')">Back to home</v-btn>
-          </h1>
-          <v-btn
-            @click="snackbar = true"
-          >
-            Open Snackbar
-          </v-btn>
-        </v-col>
-
-
         <div class="text-center ma-2">
           <v-snackbar
             v-model="snackbar"
           >
             {{ text }}
-
-            <template v-slot:actions>
-              <v-btn
-                color="pink"
-                variant="text"
-                @click="snackbar = false"
-              >
-                Close
-              </v-btn>
-            </template>
           </v-snackbar>
         </div>
 
@@ -94,8 +61,6 @@ export default {
   //   var originalText = bytes.toString(CryptoJS.enc.Utf8);
   },
   data: () => ({
-    label: 'Banner with one line of text.',
-    label2: 'back to main page',
     snackbar: false,
     loading: false,
     text: `Hello, I'm a snackbar`,
@@ -103,7 +68,7 @@ export default {
     password: '',
     nameRules: [
       value => {
-        if (value?.length > 3) return true
+        if (value?.length > 2) return true
         return 'User name must be at least 3 characters.'
       },
     ],
@@ -123,22 +88,9 @@ export default {
   },
 
   methods:{
-    call1(){
-      var aboutAPI = process.env.VUE_APP_API_URL + "/about"   
-      fetch(aboutAPI)
-      .then((response) => response.text())
-      .then((data) => {
-        this.label = data
-      });
-    },
     login(){
-      // TO-DO: delay 1 second to slow down hacker
-
-      if (this.userName.length > 3 && this.password.length > 7) {
+      if (this.userName.length > 2 && this.password.length > 7) {
         this.loading = true
-
-        // TO-DO: add salt
-        var hash = CryptoJS.SHA256(this.password)
 
         var loginAPI = process.env.VUE_APP_API_URL + "/login"        
         fetch(loginAPI, {
@@ -146,15 +98,22 @@ export default {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             name: this.userName,
-            password: this.password,
+            password: CryptoJS.SHA256(this.password).toString(CryptoJS.enc.Base64),
           })
         })
-        .then((response) => response.text())
-        .then((data) => {
-          this.label = data
+        .then((response) => response.json())
+        .then((user) => {
+          console.log(JSON.stringify(user))
+          this.loading = false
+          this.snackbar = true
+          this.text = user.status
+
           // if is vaild user
-          sessionStorage.setItem('isAuth', 'true');
-          this.$router.push('/account')
+          if (user.isvalid){
+            sessionStorage.setItem('isAuth', 'true');
+            sessionStorage.setItem('user', JSON.stringify(user));
+            this.$router.push('/account')
+          }
         })
       }
     },
