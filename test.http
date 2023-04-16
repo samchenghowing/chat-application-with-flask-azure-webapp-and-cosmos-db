@@ -2,6 +2,35 @@
 This file can help you to test the api locally by installing the httpBook extensions in VScode. 
 The password of Alice is 12345678.
 */
+POST http://127.0.0.1:5000/api/send
+Content-Type: application/json
+
+{"name": "Alice","postId": 1, "userID":1,"content": "WTF this CORF sh"
+}
+
+
+HTTP/1.1 200  - OK
+server: Werkzeug/2.2.2 Python/3.9.5
+date: Sun, 16 Apr 2023 12:45:32 GMT
+content-type: application/json
+content-length: 14
+access-control-allow-origin: *
+connection: close
+###
+POST http://127.0.0.1:5000/api/getupdate
+Content-Type: application/json
+
+{"postId": 1}
+
+
+HTTP/1.1 200  - OK
+server: Werkzeug/2.2.2 Python/3.9.5
+date: Sun, 16 Apr 2023 12:46:11 GMT
+content-type: application/json
+content-length: 112
+access-control-allow-origin: *
+connection: close
+###
 POST  http://localhost:5000/api/signup
 Content-Type: application/json
 
@@ -22,8 +51,8 @@ Content-Type: application/json
 
 HTTP/1.1 200  - OK
 server: Werkzeug/2.2.2 Python/3.9.5
-date: Sun, 16 Apr 2023 08:40:17 GMT
+date: Sun, 16 Apr 2023 12:42:50 GMT
 content-type: application/json
-content-length: 190
+content-length: 101
 access-control-allow-origin: *
 connection: close
