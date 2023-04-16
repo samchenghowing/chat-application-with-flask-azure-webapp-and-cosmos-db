@@ -112,6 +112,11 @@ export default {
           if (user.isvalid){
             sessionStorage.setItem('isAuth', 'true');
             sessionStorage.setItem('user', JSON.stringify(user));
+            window.dispatchEvent(new CustomEvent('isAuth-changed', {
+              detail: {
+                isAuth: sessionStorage.getItem('isAuth')
+              }
+            }));
             this.$router.push('/account')
           }
         })

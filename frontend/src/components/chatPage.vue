@@ -1,49 +1,57 @@
 <template>
-  <div>
-    <!-- <router-link to="/Home">Home</router-link> -->
-    <p></p>
-    <!-- <router-link to="/account">Account</router-link> -->
-    <div class="chat-header">
-      <h1>Chat</h1>
-    </div>
-    <div class="chat-messages">
-      <div class="message" v-for="message in messages" :key="message.id">
-        <div class="message-info">
-          <div class="message-author">{{ message.author }}</div>
-          <div class="message-timestamp">{{ message.timestamp }}</div>
-        </div>
-        <div class="message-text">{{ message.text }}</div>
-      </div>
-    </div>
-    <div class="chat-input">
-      <input type="text" v-model="messageText" @keyup.enter="sendMessage" />
-      <button @click="sendMessage">Send</button>
-    </div>
-  </div>
+  <v-form>
+    <v-container>
+      <v-row>
+        <v-col cols="12">
+          <h1>{{user}}'s chatRoom</h1>
+          <div class="message" v-for="message in messages" :key="message.sent">
+            <v-card
+              :title=message.name
+              :subtitle=message.sent
+              :text=message.content
+            ></v-card>
+          </div>
+        </v-col>
+
+        <v-col cols="12">
+          <v-text-field
+            v-model="messageText"
+            clearable
+            label="Message"
+            type="text"
+            variant="outlined"
+          >
+            <template v-slot:append>
+              <v-menu>
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props" class="mt-n2" @click="sendMessage">
+                    Send
+                    <v-icon icon="mdi-send" end></v-icon>
+                  </v-btn>
+                </template>
+              </v-menu>
+            </template>
+          </v-text-field>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-form>
 </template>
-  
+
 <script>
 export default {
   mounted() {
-    // TO-DO: if not logged in, route back to home
+    this.timer = setInterval(() => {
+      this.getUpdate()
+    }, 2000)
   },
   name: "ChatPage",
   data() {
     return {
-      messages: [
-        {
-          id: 1,
-          author: "Alice",
-          timestamp: "12:01 PM",
-          text: "Hey, how are you?",
-        },
-        {
-          id: 2,
-          author: "Bob",
-          timestamp: "12:02 PM",
-          text: "I'm doing well, thanks. How about you?",
-        },
-      ],
+      timer: null,
+      postID: 1,
+      user: "",
+      messages: null,
       messageText: "",
     };
   },
@@ -52,18 +60,48 @@ export default {
       if (this.messageText.trim() === "") {
         return;
       }
+      var obj = JSON.parse(sessionStorage.user)
+      var name = obj["User info"]["name"]
+      var userID = obj["User info"]["id"]
 
-      const newMessage = {
-        id: this.messages.length + 1,
-        author: "Alice",
-        timestamp: new Date().toLocaleTimeString(),
-        text: this.messageText,
-      };
+      var updateAPI = process.env.VUE_APP_API_URL + "/chat/send"
+      fetch(updateAPI, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          postId: this.postID,
+          userID: userID,
+          name: name,
+          content: this.messageText,
+        })
+      })
+      .then((response) => response.json())
+      .then((post) => {
+        this.getUpdate()
+      })
+    },
 
-      this.messages.push(newMessage);
-      this.messageText = "";
+    getUpdate(){
+      var updateAPI = process.env.VUE_APP_API_URL + "/chat/getupdate"
+      fetch(updateAPI, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId: this.postID
+        })
+      })
+      .then((response) => response.json())
+      .then((post) => {
+        this.messages = post
+        var obj = JSON.parse(sessionStorage.user)
+        var name = obj["User info"]["name"]
+        this.user = name
+      })
     },
   },
+  beforeDestroy() {
+    clearInterval(this.timer)
+  }
 };
 </script>
   

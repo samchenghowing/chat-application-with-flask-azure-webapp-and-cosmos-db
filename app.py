@@ -26,24 +26,24 @@ def get_db_connection():
     conn.row_factory = dict_factory
     return conn
 
+# This rout is for testing use only.
 @app.route("/")
 def main():
     return "Wellcome to COMP3334 Backend!" 
 
+# This rout is for testing use only.
 @app.route('/api/users')
 @cross_origin()
 def get_users():
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM users').fetchall()
     conn.close()
-
     return users, 200
 
 @app.route('/api/signup', methods=['POST'])
 @cross_origin()
 def signup():
     json_data = request.get_json()
-
     name = json_data['name']
     password = json_data['password']
 
@@ -64,14 +64,11 @@ def signup():
                 (name, hash, 0)
                 )
     
-
     conn.commit()
-    # users = conn.execute('SELECT * FROM users').fetchall()
     conn.close()
 
     json_data = {"signup":True}
     return jsonify(json_data), 200
-
 
 @app.route('/api/login', methods=['POST'])
 @cross_origin()
@@ -107,30 +104,53 @@ def login():
 
     if user is None:
         json_data = {"isvalid":False,"from client": request.remote_addr,
-                        "attempt count": IPDict[request.remote_addr],
+                        "attempt count": IPDict[request.remote_addr][0],
                         "status": "User not exist in database!"}
         return jsonify(json_data), 200
 
     hashedpw = user.get('pwHash')
     if check_password_hash(hashedpw, password):
         user.pop("pwHash")
+        IPDict[request.remote_addr].append(user.get('id'))
         json_data = {"isvalid":True, "from client": request.remote_addr,
-                    "attempt count": IPDict[request.remote_addr], "User info": user}
+                    "attempt count": IPDict[request.remote_addr][0], "User info": user}
         return jsonify(json_data), 200
     else:
         json_data = {"isvalid":False, "from client": request.remote_addr,
-                    "attempt count": IPDict[request.remote_addr], "status": "password not match"}
+                    "attempt count": IPDict[request.remote_addr][0], "status": "password not match"}
         return jsonify(json_data), 200
 
-
-@app.route('/api/confirm/<token>')
+@app.route('/api/chat/getupdate', methods=['POST'])
 @cross_origin()
-def confirm_email():
+def getupdate():
+    json_data = request.get_json()
+    postId = json_data['postId']
+
     conn = get_db_connection()
-    users = conn.execute('SELECT * FROM users').fetchall()
+    sql_select_query = """select * from chat where postId = ?"""
+    chats = conn.execute(sql_select_query, (postId,)).fetchall()
+    conn.close()
+
+    return chats, 200
+
+@app.route('/api/chat/send', methods=['POST'])
+@cross_origin()
+def chat():
+    json_data = request.get_json()
+    postId = json_data['postId']
+    userID = json_data['userID']
+    name = json_data['name']
+    content = json_data['content']
+
+    conn = get_db_connection()
+    conn.execute("INSERT INTO chat (postId, userId, name, content) VALUES (?,?,?,?)",
+                (postId, userID, name, content)
+                )
+    conn.commit()
     conn.close()
     
-    return users, 200
+    json_data = {"send":True}
+    return jsonify(json_data), 200
 
 if __name__ == "__main__":
     app.run()

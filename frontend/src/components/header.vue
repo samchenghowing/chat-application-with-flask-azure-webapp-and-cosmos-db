@@ -26,13 +26,30 @@
 
             <v-list density="compact" nav>
                 <v-list-item prepend-icon="mdi-home" title="Home" v-on:click="$router.push('/')"></v-list-item>
-                <v-list-item prepend-icon="mdi-account-box" title="Account" v-on:click="$router.push('/account')"></v-list-item>
-                <v-list-item prepend-icon="mdi-chat" title="Chat" v-on:click="$router.push('/chatPage')"></v-list-item>
+                <v-list-item prepend-icon="mdi-account-box" title="Account" v-on:click="isLoggedIn? $router.push('/account'):dialog=true"></v-list-item>
+                <v-list-item prepend-icon="mdi-chat" title="Chat" v-on:click="isLoggedIn? $router.push('/chatPage'):dialog=true"></v-list-item>
                 <v-list-item prepend-icon="mdi-login" title="login" v-on:click="$router.push('/login')"></v-list-item>
                 <v-list-item prepend-icon="mdi-account" title="signup" v-on:click="$router.push('/signup')"></v-list-item>
                 <v-list-item prepend-icon="mdi-logout" title="Logout" v-on:click="logout"></v-list-item>
             </v-list>
         </v-navigation-drawer>
+
+        <div class="text-center">
+            <v-dialog
+            v-model="dialog"
+            width="auto"
+            >
+            <v-card>
+                <v-card-text>
+                You must login to use this function.
+                </v-card-text>
+                <v-card-actions>
+                <v-btn color="primary" block @click="dialog = false">Close Dialog</v-btn>
+                </v-card-actions>
+            </v-card>
+            </v-dialog>
+        </div>
+
     </v-layout>
     </v-card>
 </template>
@@ -40,16 +57,17 @@
 <script>
 export default {
     mounted(){
-        if (sessionStorage.getItem('isAuth') === 'true') {
-            this.isLoggedIn = true;
+        window.addEventListener('isAuth-changed', (event) => {
+            this.isLoggedIn = event.detail.isAuth;
             var obj = JSON.parse(sessionStorage.user)
             this.UserName = obj["User info"]["name"]
-        }
+        });
     },
     data() {
         return {
             isLoggedIn: false,
             drawer: null,
+            dialog: false,
             UserName: "Guest user",
         }
     },

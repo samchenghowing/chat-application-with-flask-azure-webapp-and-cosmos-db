@@ -84,7 +84,6 @@ export default {
 
   methods:{
     signup(){
-      this.recaptcha.execute()
       if (this.userName.length > 2 && this.password.length > 7) {
 
         var signupAPI = process.env.VUE_APP_API_URL + "/signup"   
@@ -102,6 +101,7 @@ export default {
           this.text = data.status
           if(data.signup){
             this.$router.push('/login')
+            alert("Signup success")
           }
         })
       }
