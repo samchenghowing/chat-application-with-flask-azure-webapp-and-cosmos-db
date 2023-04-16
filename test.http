@@ -5,12 +5,12 @@ The password of Alice is 12345678.
 POST http://127.0.0.1:5000/api/chat/send
 Content-Type: application/json
 
-{"name": "Alice","postId": 1, "userID":1,"content": "WTF this CORF sh"
+{"name": "Bob","postId": 1, "userID":2,"content": "yoooooo"
 }
 
 HTTP/1.1 200  - OK
 server: Werkzeug/2.2.2 Python/3.9.5
-date: Sun, 16 Apr 2023 13:10:59 GMT
+date: Sun, 16 Apr 2023 13:19:11 GMT
 content-type: application/json
 content-length: 14
 access-control-allow-origin: *

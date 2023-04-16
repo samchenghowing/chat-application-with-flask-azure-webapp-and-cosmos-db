@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS chat;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE chat (
-    postId INTEGER PRIMARY KEY,
+    postId INTEGER,
     title TEXT,
     userId INTEGER NOT NULL,
     name TEXT NOT NULL,
