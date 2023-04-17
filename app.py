@@ -41,6 +41,8 @@ def checkpassword(name, password):
 
     hashedpw = user.get('pwHash')
     if check_password_hash(hashedpw, password):
+        # update the format of hash
+        user["pwHash"] = password
         IPDict[request.remote_addr].append(user.get('id'))
         json_data = {"isvalid":True, "from client": request.remote_addr,
                     "attempt count": IPDict[request.remote_addr][0], "User info": user}
