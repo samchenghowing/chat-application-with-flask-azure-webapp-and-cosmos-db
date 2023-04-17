@@ -5,12 +5,12 @@ The password of Alice is 12345678.
 POST http://127.0.0.1:5000/api/chat/send
 Content-Type: application/json
 
-{"name": "Bob","postId": 1, "userID":2,"content": "yoooooo"
+{"name": "Alice","postId": 1, "userID":2,"content": "yoooooo", "pwHash":"73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="
 }
 
 HTTP/1.1 200  - OK
 server: Werkzeug/2.2.2 Python/3.9.5
-date: Sun, 16 Apr 2023 13:19:11 GMT
+date: Mon, 17 Apr 2023 01:58:29 GMT
 content-type: application/json
 content-length: 14
 access-control-allow-origin: *
@@ -19,38 +19,39 @@ connection: close
 POST http://127.0.0.1:5000/api/chat/getupdate
 Content-Type: application/json
 
-{"postId": 1}
+{"name": "Alice","postId": 1, "userID":2,"content": "yoooooo", "pwHash":"73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="
+}
 
 HTTP/1.1 200  - OK
 server: Werkzeug/2.2.2 Python/3.9.5
-date: Sun, 16 Apr 2023 13:11:22 GMT
+date: Mon, 17 Apr 2023 01:58:35 GMT
 content-type: application/json
-content-length: 112
+content-length: 323
 access-control-allow-origin: *
 connection: close
 ###
 POST  http://localhost:5000/api/signup
 Content-Type: application/json
 
-{"name": "Alice","password": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="}
+{"name": "Alice","pwHash": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="}
 
 HTTP/1.1 200  - OK
 server: Werkzeug/2.2.2 Python/3.9.5
-date: Thu, 13 Apr 2023 08:58:52 GMT
+date: Mon, 17 Apr 2023 00:33:55 GMT
 content-type: application/json
-content-length: 18
+content-length: 16
 access-control-allow-origin: *
 connection: close
 ###
 POST  http://localhost:5000/api/login
 Content-Type: application/json
 
-{"name": "Alice","password": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8=", "SECRET_KEY": "COMP3334group30Spring2023"}
+{"name": "Alice","pwHash": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8=", "SECRET_KEY": "COMP3334group30Spring2023"}
 
 HTTP/1.1 200  - OK
 server: Werkzeug/2.2.2 Python/3.9.5
-date: Sun, 16 Apr 2023 12:42:50 GMT
+date: Mon, 17 Apr 2023 01:57:48 GMT
 content-type: application/json
-content-length: 101
+content-length: 270
 access-control-allow-origin: *
 connection: close

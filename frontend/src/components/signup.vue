@@ -92,7 +92,7 @@ export default {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             name: this.userName,
-            password: CryptoJS.SHA256(this.password).toString(CryptoJS.enc.Base64),
+            pwHash: CryptoJS.SHA256(this.password).toString(CryptoJS.enc.Base64),
           })
         })
         .then((response) => response.json())

@@ -26,6 +26,30 @@ def get_db_connection():
     conn.row_factory = dict_factory
     return conn
 
+def checkpassword(name, password):
+    # TO-DO: avoid sql injection
+    conn = get_db_connection()
+    sql_select_query = """select * from users where name = ?"""
+    user = conn.execute(sql_select_query, (name,)).fetchone()
+    conn.close()
+
+    if user is None:
+        json_data = {"isvalid":False,"from client": request.remote_addr,
+                        "attempt count": IPDict[request.remote_addr][0],
+                        "status": "User not exist in database!"}
+        return json_data
+
+    hashedpw = user.get('pwHash')
+    if check_password_hash(hashedpw, password):
+        IPDict[request.remote_addr].append(user.get('id'))
+        json_data = {"isvalid":True, "from client": request.remote_addr,
+                    "attempt count": IPDict[request.remote_addr][0], "User info": user}
+        return json_data
+    else:
+        json_data = {"isvalid":False, "from client": request.remote_addr,
+                    "attempt count": IPDict[request.remote_addr][0], "status": "password not match"}
+        return json_data
+
 # This rout is for testing use only.
 @app.route("/")
 def main():
@@ -45,7 +69,7 @@ def get_users():
 def signup():
     json_data = request.get_json()
     name = json_data['name']
-    password = json_data['password']
+    password = json_data['pwHash']
 
     # TO-DO: avoid sql injection
 
@@ -73,7 +97,6 @@ def signup():
 @app.route('/api/login', methods=['POST'])
 @cross_origin()
 def login():
-    json_data = request.get_json()
 
     # check if brute force trying password to login
     if request.remote_addr not in IPDict:
@@ -91,40 +114,24 @@ def login():
             return jsonify(json_data), 200
         IPDict[request.remote_addr][0] = IPDict[request.remote_addr][0] + 1
 
+    json_data = request.get_json()
     name = json_data['name']
-    password = json_data['password']
+    password = json_data['pwHash']
 
-
-    # TO-DO: avoid sql injection
-
-    conn = get_db_connection()
-    sql_select_query = """select * from users where name = ?"""
-    user = conn.execute(sql_select_query, (name,)).fetchone()
-    conn.close()
-
-    if user is None:
-        json_data = {"isvalid":False,"from client": request.remote_addr,
-                        "attempt count": IPDict[request.remote_addr][0],
-                        "status": "User not exist in database!"}
-        return jsonify(json_data), 200
-
-    hashedpw = user.get('pwHash')
-    if check_password_hash(hashedpw, password):
-        user.pop("pwHash")
-        IPDict[request.remote_addr].append(user.get('id'))
-        json_data = {"isvalid":True, "from client": request.remote_addr,
-                    "attempt count": IPDict[request.remote_addr][0], "User info": user}
-        return jsonify(json_data), 200
-    else:
-        json_data = {"isvalid":False, "from client": request.remote_addr,
-                    "attempt count": IPDict[request.remote_addr][0], "status": "password not match"}
-        return jsonify(json_data), 200
+    # TO-DO: avoid sql injection (XSS)
+    json_data = checkpassword(name, password)
+    return jsonify(json_data), 200
 
 @app.route('/api/chat/getupdate', methods=['POST'])
 @cross_origin()
 def getupdate():
     json_data = request.get_json()
     postId = json_data['postId']
+    name = json_data['name']
+    password = json_data['pwHash']
+    isVaildRequest = checkpassword(name, password)
+    if isVaildRequest['isvalid'] == False:
+        return isVaildRequest, 200
 
     conn = get_db_connection()
     sql_select_query = """select * from chat where postId = ?"""
@@ -141,6 +148,11 @@ def chat():
     userID = json_data['userID']
     name = json_data['name']
     content = json_data['content']
+    password = json_data['pwHash']
+    # TO-DO: avoid sql injection
+    isVaildRequest = checkpassword(name, password)
+    if isVaildRequest['isvalid'] == False:
+        return isVaildRequest, 200
 
     conn = get_db_connection()
     conn.execute("INSERT INTO chat (postId, userId, name, content) VALUES (?,?,?,?)",

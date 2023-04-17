@@ -63,6 +63,7 @@ export default {
       var obj = JSON.parse(sessionStorage.user)
       var name = obj["User info"]["name"]
       var userID = obj["User info"]["id"]
+      var pwHash = obj["User info"]["pwHash"]
 
       var updateAPI = process.env.VUE_APP_API_URL + "/chat/send"
       fetch(updateAPI, {
@@ -72,6 +73,7 @@ export default {
           postId: this.postID,
           userID: userID,
           name: name,
+          pwHash: pwHash,
           content: this.messageText,
         })
       })
@@ -83,11 +85,18 @@ export default {
 
     getUpdate(){
       var updateAPI = process.env.VUE_APP_API_URL + "/chat/getupdate"
+      var obj = JSON.parse(sessionStorage.user)
+      var name = obj["User info"]["name"]
+      var userID = obj["User info"]["id"]
+      var pwHash = obj["User info"]["pwHash"]
       fetch(updateAPI, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          postId: this.postID
+          postId: this.postID,
+          userID: userID,
+          name: name,
+          pwHash: pwHash,
         })
       })
       .then((response) => response.json())
