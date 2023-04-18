@@ -27,7 +27,6 @@ def get_db_connection():
     return conn
 
 def checkpassword(name, password):
-    # TO-DO: avoid sql injection
     conn = get_db_connection()
     sql_select_query = """select * from users where name = ?"""
     user = conn.execute(sql_select_query, (name,)).fetchone()
@@ -41,7 +40,7 @@ def checkpassword(name, password):
 
     hashedpw = user.get('pwHash')
     if check_password_hash(hashedpw, password):
-        # update the format of hash
+        # update the format of hash before send to client
         user["pwHash"] = password
         IPDict[request.remote_addr].append(user.get('id'))
         json_data = {"isvalid":True, "from client": request.remote_addr,
@@ -52,12 +51,12 @@ def checkpassword(name, password):
                     "attempt count": IPDict[request.remote_addr][0], "status": "password not match"}
         return json_data
 
-# This rout is for testing use only.
+# This route is for testing use only.
 @app.route("/")
 def main():
     return "Wellcome to COMP3334 Backend!" 
 
-# This rout is for testing use only.
+# This route is for testing use only.
 @app.route('/api/users')
 @cross_origin()
 def get_users():
@@ -72,8 +71,6 @@ def signup():
     json_data = request.get_json()
     name = json_data['name']
     password = json_data['pwHash']
-
-    # TO-DO: avoid sql injection
 
     # check if user exist in database
     conn = get_db_connection()
@@ -104,14 +101,14 @@ def login():
     if request.remote_addr not in IPDict:
         IPDict[request.remote_addr] = [0, datetime.now()]
     else:
-        # reset the count to unblock user after a minute
-        if datetime.now() - IPDict[request.remote_addr][1] > timedelta(minutes=1):
+        # reset the count to unblock user after 5 minutes
+        if datetime.now() - IPDict[request.remote_addr][1] > timedelta(minutes=5):
             IPDict[request.remote_addr] = [0, datetime.now()]
 
         if IPDict[request.remote_addr][0] == 5:
             json_data = {"isvalid":False, "from client": request.remote_addr, 
                           "attempt count": IPDict[request.remote_addr][0], 
-                          "status": "This IP is blocked 1 minutes since too many\
+                          "status": "This IP is blocked 5 minutes since too many\
                                     failed login attempts"}
             return jsonify(json_data), 200
         IPDict[request.remote_addr][0] = IPDict[request.remote_addr][0] + 1
@@ -120,7 +117,6 @@ def login():
     name = json_data['name']
     password = json_data['pwHash']
 
-    # TO-DO: avoid sql injection (XSS)
     json_data = checkpassword(name, password)
     return jsonify(json_data), 200
 
@@ -131,6 +127,7 @@ def getupdate():
     postId = json_data['postId']
     name = json_data['name']
     password = json_data['pwHash']
+
     isVaildRequest = checkpassword(name, password)
     if isVaildRequest['isvalid'] == False:
         return isVaildRequest, 200
@@ -151,7 +148,7 @@ def chat():
     name = json_data['name']
     content = json_data['content']
     password = json_data['pwHash']
-    # TO-DO: avoid sql injection
+
     isVaildRequest = checkpassword(name, password)
     if isVaildRequest['isvalid'] == False:
         return isVaildRequest, 200
@@ -164,6 +161,37 @@ def chat():
     conn.close()
     
     json_data = {"send":True}
+    return jsonify(json_data), 200
+
+
+@app.route('/api/account/updateProfile', methods=['POST'])
+@cross_origin()
+def changePassword():
+    json_data = request.get_json()
+    userID = json_data['userID']
+    name = json_data['name']
+    oldpassword = json_data['oldpwHash']
+
+    newname = json_data['newname']
+    newemail = json_data['newemail']
+    newpassword = json_data['newpwHash']
+    isVaildRequest = checkpassword(name, oldpassword)
+    if isVaildRequest['isvalid'] == False:
+        return isVaildRequest, 200
+
+    hash = generate_password_hash(newpassword)
+    conn = get_db_connection()
+    conn.execute("UPDATE users SET name=?, email=?, pwHash=? WHERE id=?",
+                (newname, newemail, hash, userID)
+                )
+    conn.commit()
+    sql_select_query = """select * from users where name = ?"""
+    user = conn.execute(sql_select_query, (name,)).fetchone()
+    conn.close()
+    
+    user["pwHash"] = newpassword
+    json_data = {"isvalid":True, "from client": request.remote_addr,
+                "attempt count": IPDict[request.remote_addr][0], "User info": user}
     return jsonify(json_data), 200
 
 if __name__ == "__main__":

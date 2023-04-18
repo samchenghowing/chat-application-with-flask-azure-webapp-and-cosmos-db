@@ -6,7 +6,7 @@
         <img :src="profilePicture" alt="Profile Picture" />
       </div>
       <div class="details">
-        <h2>{{ fullName }}</h2>
+        <h2>{{ userName }}</h2>
         <p>{{ email }}</p>
         <button @click="editProfile">Edit Profile</button>
       </div>
@@ -14,42 +14,142 @@
     <div class="settings">
       <h2>Settings</h2>
       <ul>
-        <li>
+        <!-- <li>
           <router-link to="/account/change-password"
             >Change Password</router-link
           >
-        </li>
-        <li>
+        </li> -->
+        <!-- <li>
           <router-link to="/account/privacy-settings"
             >Privacy Settings</router-link
           >
-        </li>
-        <li>
+        </li> -->
+        <!-- <li>
           <router-link to="/account/delete-account">Delete Account</router-link>
-        </li>
+        </li> -->
       </ul>
     </div>
+    <v-row justify="center">
+      <v-dialog
+        v-model="dialog"
+        persistent
+        width="1024"
+      >
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">User Profile</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="4"
+                >
+                  <v-text-field
+                    v-model="userName"
+                    label="Name*"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="email"
+                    label="Email"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="oldpassword"
+                    label="Old Password*"
+                    type="password"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="password"
+                    label="New Password*"
+                    type="password"
+                    required
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>*indicates required field</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue-darken-1"
+              variant="text"
+              @click="dialog = false"
+            >
+              Cancel
+            </v-btn>
+            <v-btn
+              color="blue-darken-1"
+              variant="text"
+              @click.prevent="updateSetting()"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </div>
 </template>
   
   <script>
+import CryptoJS from 'crypto-js';
+
 export default {
   name: "AccountPage",
   mounted(){
     var obj = JSON.parse(sessionStorage.user)
-    this.fullName = obj["User info"]["name"]
+    this.userName = obj["User info"]["name"]
     this.email = obj["User info"]["email"]
   },
   data() {
     return {
-      fullName: '',
+      userName: '',
       email: '',
+      oldpassword: '',
+      password: '',
+      dialog: false,
       profilePicture: "https://via.placeholder.com/150",
     };
   },
   methods: {
     editProfile() {
-      this.$router.push("/account/edit-profile");
+      this.dialog = true
+    },
+    updateSetting() {
+      this.dialog = false
+      var obj = JSON.parse(sessionStorage.user)
+      var name = obj["User info"]["name"]
+      var userID = obj["User info"]["id"]
+      var pwHash = obj["User info"]["pwHash"]
+
+      var editAPI = process.env.VUE_APP_API_URL + "/account/updateProfile"   
+        fetch(editAPI, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            userID: userID,
+            name: name,
+            oldpwHash: pwHash,
+            newname: this.userName,
+            newemail: this.email,
+            newpwHash: CryptoJS.SHA256(this.password).toString(CryptoJS.enc.Base64),
+          })
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          alert(JSON.stringify(data))
+        })
     },
   },
 };

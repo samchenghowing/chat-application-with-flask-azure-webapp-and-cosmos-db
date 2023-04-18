@@ -2,8 +2,16 @@
   <v-form>
     <v-container>
       <v-row>
-        <v-col cols="12">
-          <h1>{{user}}'s chatRoom</h1>
+        <v-col>
+          <h1>
+            chatRoom {{chatRoom}}          
+            <v-btn
+              @click="dialog = true"
+            >
+              change chatroom
+            </v-btn>
+          </h1>
+
           <div class="message" v-for="message in messages" :key="message.sent">
             <v-card
               :title=message.name
@@ -11,9 +19,6 @@
               :text=message.content
             ></v-card>
           </div>
-        </v-col>
-
-        <v-col cols="12">
           <v-text-field
             v-model="messageText"
             clearable
@@ -35,6 +40,39 @@
         </v-col>
       </v-row>
     </v-container>
+        
+    <v-row justify="center">
+      <v-dialog
+        v-model="dialog"
+        persistent
+        width="auto"
+      >
+        <v-card>
+          <v-card-title class="text-h5">
+            Chatrooms
+          </v-card-title>
+          <v-card-text>Choose a chatroom to start chating</v-card-text>
+
+          <v-combobox
+            v-model="chatRoom"
+            label="chatRoom"
+            :items="items"
+          >
+          </v-combobox>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              v-model="confirmButton"
+              :disabled="!items.length"
+              @click="dialog = false"
+            >
+              Confirm
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </v-form>
 </template>
 
@@ -53,6 +91,9 @@ export default {
       user: "",
       messages: null,
       messageText: "",
+      dialog: true,
+      items: [1, 2, 3],
+      chatRoom: [],
     };
   },
   methods: {
@@ -89,6 +130,8 @@ export default {
       var name = obj["User info"]["name"]
       var userID = obj["User info"]["id"]
       var pwHash = obj["User info"]["pwHash"]
+      this.postID = this.chatRoom
+
       fetch(updateAPI, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
