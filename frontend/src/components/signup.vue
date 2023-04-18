@@ -69,7 +69,7 @@ export default {
     password: '',
     nameRules: [
       value => {
-        if (value?.length > 3) return true
+        if (value?.length > 2) return true
         return 'User name must be at least 3 characters.'
       },
     ],

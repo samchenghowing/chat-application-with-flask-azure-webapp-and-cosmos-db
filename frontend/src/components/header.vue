@@ -25,12 +25,15 @@
             <v-divider></v-divider>
 
             <v-list density="compact" nav>
-                <v-list-item prepend-icon="mdi-home" title="Home" v-on:click="$router.push('/')"></v-list-item>
-                <v-list-item prepend-icon="mdi-account-box" title="Account" v-on:click="isLoggedIn? $router.push('/account'):dialog=true"></v-list-item>
-                <v-list-item prepend-icon="mdi-chat" title="Chat" v-on:click="isLoggedIn? $router.push('/chatPage'):dialog=true"></v-list-item>
-                <v-list-item prepend-icon="mdi-login" title="login" v-on:click="$router.push('/login')"></v-list-item>
-                <v-list-item prepend-icon="mdi-account" title="signup" v-on:click="$router.push('/signup')"></v-list-item>
-                <v-list-item prepend-icon="mdi-logout" title="Logout" v-on:click="logout"></v-list-item>
+                <div v-if=isLoggedIn>
+                    <v-list-item prepend-icon="mdi-account-box" title="Account" v-on:click="isLoggedIn? $router.push('/account'):dialog=true"></v-list-item>
+                    <v-list-item prepend-icon="mdi-chat" title="Chat" v-on:click="isLoggedIn? $router.push('/chatPage'):dialog=true"></v-list-item>
+                    <v-list-item prepend-icon="mdi-logout" title="Logout" v-on:click="logout"></v-list-item>
+                </div>
+                <div v-else>
+                    <v-list-item prepend-icon="mdi-account" title="Sign Up" v-on:click="$router.push('/signup')"></v-list-item>
+                    <v-list-item prepend-icon="mdi-login" title="Login" v-on:click="$router.push('/login')"></v-list-item>
+                </div>
             </v-list>
         </v-navigation-drawer>
 
