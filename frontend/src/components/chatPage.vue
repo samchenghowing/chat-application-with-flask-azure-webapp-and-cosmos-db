@@ -4,11 +4,11 @@
       <v-row>
         <v-col>
           <h1>
-            chatRoom {{chatRoom}}          
+            Chat Room {{chatRoom}}          
             <v-btn
               @click="dialog = true"
             >
-              change chatroom
+              Change chat room
             </v-btn>
           </h1>
 
@@ -51,7 +51,7 @@
           <v-card-title class="text-h5">
             Chatrooms
           </v-card-title>
-          <v-card-text>Choose a chatroom to start chating</v-card-text>
+          <v-card-text>Choose a chatroom to start chatting</v-card-text>
 
           <v-combobox
             v-model="chatRoom"
