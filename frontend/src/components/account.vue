@@ -24,9 +24,9 @@
             >Privacy Settings</router-link
           >
         </li> -->
-        <!-- <li>
-          <router-link to="/account/delete-account">Delete Account</router-link>
-        </li> -->
+        <li>
+          <button @click="deleteAccount()">Delete Account</button>
+        </li>
       </ul>
     </div>
     <v-row justify="center">
@@ -123,6 +123,32 @@ export default {
     };
   },
   methods: {
+    deleteAccount() {
+      if (confirm("Are you sure to delete your account?") == true) {
+      var obj = JSON.parse(sessionStorage.user)
+      var name = obj["User info"]["name"]
+      var userID = obj["User info"]["id"]
+      var pwHash = obj["User info"]["pwHash"]
+
+        var loginAPI = process.env.VUE_APP_API_URL + "/account/deleteAccount"        
+        fetch(loginAPI, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            userID: userID,
+            name: name,
+            pwHash: pwHash,
+          })
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if(data.isvalid){
+            this.$router.push('/login')
+            alert("You account is deleted")
+          }
+        })
+      } else { }
+    },
     editProfile() {
       this.dialog = true
     },

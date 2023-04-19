@@ -117,7 +117,7 @@ export default {
                 isAuth: sessionStorage.getItem('isAuth')
               }
             }));
-            this.$router.push('/account')
+            this.$router.push('/chatPage')
           }
         })
       }

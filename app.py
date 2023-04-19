@@ -194,5 +194,28 @@ def changePassword():
                 "attempt count": IPDict[request.remote_addr][0], "User info": user}
     return jsonify(json_data), 200
 
+@app.route('/api/account/deleteAccount', methods=['POST'])
+@cross_origin()
+def deleteAccount():
+    json_data = request.get_json()
+    userID = json_data['userID']
+    name = json_data['name']
+    pwHash = json_data['pwHash']
+
+    isVaildRequest = checkpassword(name, pwHash)
+    if isVaildRequest['isvalid'] == False:
+        return isVaildRequest, 200
+
+    conn = get_db_connection()
+    conn.execute("DELETE FROM users WHERE id=?",
+                (userID,)
+                )
+    conn.commit()
+    conn.close()
+    
+    json_data = {"isvalid":True, "from client": request.remote_addr,
+                "User info": "account deleted"}
+    return jsonify(json_data), 200
+
 if __name__ == "__main__":
     app.run()

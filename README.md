@@ -4,6 +4,7 @@ Here is the showcase of the frontend:
 <https://samchenghowing.github.io/COMP3334/#/>
 
 Used technologies:
+
 Frontend: Vue.js
 
 Backend: Python flask

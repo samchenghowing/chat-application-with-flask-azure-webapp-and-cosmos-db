@@ -46,7 +46,7 @@ connection: close
 POST  http://localhost:5000/api/login
 Content-Type: application/json
 
-{"name": "Alice","pwHash": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8=", "SECRET_KEY": "COMP3334group30Spring2023"}
+{"name": "Alice","pwHash": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="}
 
 HTTP/1.1 200  - OK
 server: Werkzeug/2.2.2 Python/3.9.5
