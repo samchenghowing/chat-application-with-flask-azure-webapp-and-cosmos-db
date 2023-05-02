@@ -31,3 +31,9 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### Reference videoes
+
+<https://www.youtube.com/watch?v=PzXaFXgsp60>
+
+<https://www.danvega.dev/blog/2021/01/22/full-stack-java-vue/>

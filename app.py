@@ -7,7 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 # Client IPDict
 IPDict = {}
 
-# https://testdriven.io/blog/csrf-flask/
 app = Flask(__name__)
 cors = CORS(app)
 app.config.update(
@@ -61,7 +60,7 @@ def main():
 @cross_origin()
 def get_users():
     conn = get_db_connection()
-    users = conn.execute('SELECT * FROM users').fetchall()
+    users = conn.execute('SELECT * FROM users').fetchone()
     conn.close()
     return users, 200
 
@@ -69,24 +68,23 @@ def get_users():
 @cross_origin()
 def signup():
     json_data = request.get_json()
-    name = json_data['name']
-    password = json_data['pwHash']
 
-    # check if user exist in database
     conn = get_db_connection()
     sql_select_query = """select * from users where name = ?"""
-    res = conn.execute(sql_select_query, (name,)).fetchone()
+    res = conn.execute(sql_select_query, (json_data['name'],)).fetchone()
     if res is not None:
-        json_data = {"signup":False, "status": "User alreafy exist in database!"}
+        json_data = {
+            "signup":False, 
+            "status": "User alreafy exist in database!"
+            }
         return jsonify(json_data), 200
 
     # TO-DO: email verify
 
-    hash = generate_password_hash(password)
+    hash = generate_password_hash(json_data['pwHash'])
     conn.execute("INSERT INTO users (name, pwHash, confirmed) VALUES (?, ?, ?)",
-                (name, hash, 0)
+                (json_data['name'], hash, 0)
                 )
-    
     conn.commit()
     conn.close()
 
@@ -106,35 +104,31 @@ def login():
             IPDict[request.remote_addr] = [0, datetime.now()]
 
         if IPDict[request.remote_addr][0] == 5:
-            json_data = {"isvalid":False, "from client": request.remote_addr, 
-                          "attempt count": IPDict[request.remote_addr][0], 
-                          "status": "This IP is blocked 5 minutes since too many\
-                                    failed login attempts"}
+            json_data = {
+                "isvalid":False, "from client": request.remote_addr, 
+                "attempt count": IPDict[request.remote_addr][0], 
+                "status": "This IP is blocked 5 minutes since too many\
+                    failed login attempts"}
             return jsonify(json_data), 200
         IPDict[request.remote_addr][0] = IPDict[request.remote_addr][0] + 1
 
     json_data = request.get_json()
-    name = json_data['name']
-    password = json_data['pwHash']
 
-    json_data = checkpassword(name, password)
-    return jsonify(json_data), 200
+    json_response = checkpassword(json_data['name'], json_data['pwHash'])
+    return jsonify(json_response), 200
 
 @app.route('/api/chat/getupdate', methods=['POST'])
 @cross_origin()
 def getupdate():
     json_data = request.get_json()
-    postId = json_data['postId']
-    name = json_data['name']
-    password = json_data['pwHash']
 
-    isVaildRequest = checkpassword(name, password)
+    isVaildRequest = checkpassword(json_data['name'], json_data['pwHash'])
     if isVaildRequest['isvalid'] == False:
         return isVaildRequest, 200
 
     conn = get_db_connection()
     sql_select_query = """select * from chat where postId = ?"""
-    chats = conn.execute(sql_select_query, (postId,)).fetchall()
+    chats = conn.execute(sql_select_query, (json_data['postId'],)).fetchall()
     conn.close()
 
     return chats, 200
@@ -143,78 +137,66 @@ def getupdate():
 @cross_origin()
 def chat():
     json_data = request.get_json()
-    postId = json_data['postId']
-    userID = json_data['userID']
-    name = json_data['name']
-    content = json_data['content']
-    password = json_data['pwHash']
 
-    isVaildRequest = checkpassword(name, password)
+    isVaildRequest = checkpassword(json_data['name'], json_data['pwHash'])
     if isVaildRequest['isvalid'] == False:
         return isVaildRequest, 200
 
     conn = get_db_connection()
     conn.execute("INSERT INTO chat (postId, userId, name, content) VALUES (?,?,?,?)",
-                (postId, userID, name, content)
+                (json_data['postId'], json_data['userID'], json_data['name'], json_data['content'])
                 )
     conn.commit()
     conn.close()
     
-    json_data = {"send":True}
-    return jsonify(json_data), 200
+    return jsonify({"send":True}), 200
 
 
 @app.route('/api/account/updateProfile', methods=['POST'])
 @cross_origin()
 def changePassword():
     json_data = request.get_json()
-    userID = json_data['userID']
-    name = json_data['name']
-    oldpassword = json_data['oldpwHash']
-
-    newname = json_data['newname']
-    newemail = json_data['newemail']
-    newpassword = json_data['newpwHash']
-    isVaildRequest = checkpassword(name, oldpassword)
+    
+    isVaildRequest = checkpassword(json_data['name'], json_data['oldpwHash'])
     if isVaildRequest['isvalid'] == False:
         return isVaildRequest, 200
 
-    hash = generate_password_hash(newpassword)
+    hash = generate_password_hash(json_data['newpwHash'])
     conn = get_db_connection()
     conn.execute("UPDATE users SET name=?, email=?, pwHash=? WHERE id=?",
-                (newname, newemail, hash, userID)
+                (json_data['newname'], json_data['newemail'], hash, json_data['userID'])
                 )
     conn.commit()
     sql_select_query = """select * from users where name = ?"""
-    user = conn.execute(sql_select_query, (name,)).fetchone()
+    user = conn.execute(sql_select_query, (json_data['name'],)).fetchone()
     conn.close()
     
-    user["pwHash"] = newpassword
-    json_data = {"isvalid":True, "from client": request.remote_addr,
-                "attempt count": IPDict[request.remote_addr][0], "User info": user}
+    user["pwHash"] = json_data['newpwHash']
+    json_data = {
+        "isvalid":True, "from client": request.remote_addr,
+        "User info": user}
     return jsonify(json_data), 200
 
 @app.route('/api/account/deleteAccount', methods=['POST'])
 @cross_origin()
 def deleteAccount():
     json_data = request.get_json()
-    userID = json_data['userID']
-    name = json_data['name']
-    pwHash = json_data['pwHash']
 
-    isVaildRequest = checkpassword(name, pwHash)
-    if isVaildRequest['isvalid'] == False:
-        return isVaildRequest, 200
+    requestContent = checkpassword(json_data['name'], json_data['pwHash'])
+    if requestContent['isvalid'] == False:
+        return requestContent, 200
 
     conn = get_db_connection()
     conn.execute("DELETE FROM users WHERE id=?",
-                (userID,)
+                (json_data['userID'],)
                 )
     conn.commit()
     conn.close()
     
-    json_data = {"isvalid":True, "from client": request.remote_addr,
-                "User info": "account deleted"}
+    json_data = {
+        "isvalid":True, "from client": request.remote_addr,
+        "User info": "account deleted"
+        }
     return jsonify(json_data), 200
 
 if __name__ == "__main__":
