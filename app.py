@@ -54,17 +54,20 @@ def main():
 @app.route('/api/users')
 @cross_origin()
 def get_users():
-    credential = DefaultAzureCredential()
-    client = CosmosClient(url=endpoint, credential=credential)
+    try:
+        credential = DefaultAzureCredential()
+        client = CosmosClient(url=endpoint, credential=credential)
 
-    dataBase = client.get_database_client(DATABASE_NAME)
-    container = dataBase.get_container_client(CONTAINER_NAME)
+        return jsonify(client), 200
+        dataBase = client.get_database_client(DATABASE_NAME)
+        container = dataBase.get_container_client(CONTAINER_NAME)
 
-    existing_item = container.read_item(
-        item="001",
-        partition_key="001",
-    )
-    return existing_item, 200
+        existing_item = container.read_item(
+            item="001",
+            partition_key="001",
+        )
+    except:
+        return "Error", 200
 
 @app.route('/api/signup', methods=['POST'])
 @cross_origin()
