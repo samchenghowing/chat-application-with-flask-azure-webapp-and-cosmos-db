@@ -7,13 +7,8 @@ from azure.identity import DefaultAzureCredential
 
 endpoint = "https://comp3334nosqldb.documents.azure.com:443/"
 
-# credential = DefaultAzureCredential()
-# client = CosmosClient(url=endpoint, credential=credential)
-
-# DATABASE_NAME = "comp3334DB"
-# CONTAINER_NAME = "container1"
-# dataBase = client.get_database_client(DATABASE_NAME)
-# container = dataBase.get_container_client(CONTAINER_NAME)
+DATABASE_NAME = "comp3334DB"
+CONTAINER_NAME = "container1"
 
 # Client IPDict
 IPDict = {}
@@ -59,6 +54,12 @@ def main():
 @app.route('/api/users')
 @cross_origin()
 def get_users():
+    credential = DefaultAzureCredential()
+    client = CosmosClient(url=endpoint, credential=credential)
+
+    dataBase = client.get_database_client(DATABASE_NAME)
+    container = dataBase.get_container_client(CONTAINER_NAME)
+
     existing_item = container.read_item(
         item="001",
         partition_key="001",
