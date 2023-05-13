@@ -56,7 +56,6 @@ def main():
 def get_users():
     try:
         credential = DefaultAzureCredential()
-        return jsonify(credential), 200
         client = CosmosClient(url=endpoint, credential=credential)
 
         dataBase = client.get_database_client(DATABASE_NAME)
@@ -66,6 +65,7 @@ def get_users():
             item="001",
             partition_key="001",
         )
+        return jsonify(existing_item), 200
     except:
         return "Error", 200
 
