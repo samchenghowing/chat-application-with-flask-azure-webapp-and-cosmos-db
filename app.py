@@ -1,8 +1,19 @@
 from datetime import datetime, timedelta
-import sqlite3
 from flask import Flask,request,jsonify
 from flask_cors import CORS, cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
+from azure.cosmos import CosmosClient
+from azure.identity import DefaultAzureCredential
+
+endpoint = "https://comp3334nosqldb.documents.azure.com:443/"
+
+credential = DefaultAzureCredential()
+client = CosmosClient(url=endpoint, credential=credential)
+
+DATABASE_NAME = "comp3334DB"
+CONTAINER_NAME = "container1"
+dataBase = client.get_database_client(DATABASE_NAME)
+container = dataBase.get_container_client(CONTAINER_NAME)
 
 # Client IPDict
 IPDict = {}
@@ -13,17 +24,6 @@ app.config.update(
     DEBUG=True,
     CORS_HEADERS='Content-Type',
 )
-
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = dict_factory
-    return conn
 
 def checkpassword(name, password):
     conn = get_db_connection()
@@ -59,10 +59,11 @@ def main():
 @app.route('/api/users')
 @cross_origin()
 def get_users():
-    conn = get_db_connection()
-    users = conn.execute('SELECT * FROM users').fetchone()
-    conn.close()
-    return users, 200
+    existing_item = container.read_item(
+        item="001",
+        partition_key="001",
+    )
+    return existing_item, 200
 
 @app.route('/api/signup', methods=['POST'])
 @cross_origin()
