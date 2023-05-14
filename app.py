@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 from flask import Flask,request,jsonify
 from flask_cors import CORS, cross_origin
@@ -27,16 +28,25 @@ app.config.update(
 )
 
 def checkpassword(name, password):
-    
-    QUERY = "SELECT * FROM container1 p WHERE p.name = @name"
-    NAME = "Sam"
-    params = [dict(name="@name", value=NAME)]
 
     results = container.query_items(
-        query=QUERY, parameters=params, enable_cross_partition_query=False
+        query="SELECT * FROM c WHERE c.name = @name", 
+        parameters=[dict(name="@name", value=name)], 
+        enable_cross_partition_query=True
     )
-    return results
+    items = [item for item in results]
+    # userlist = json.dumps(items, indent=True)
+    # print("Result list\n", userlist)
 
+    if len(items) == 0:
+        json_data = {"isvalid":False,"from client": request.remote_addr,
+                        "attempt count": IPDict[request.remote_addr][0],
+                        "status": "User not exist in database!"}
+        return json_data
+    
+    return items
+
+    # code to old DB be discontinued
     sql_select_query = """select * from users where name = ?"""
     user = conn.execute(sql_select_query, (name,)).fetchone()
     conn.close()
@@ -127,7 +137,7 @@ def login():
     json_data = request.get_json()
 
     json_response = checkpassword(json_data['name'], json_data['pwHash'])
-    return jsonify(json_response), 200
+    return json_response, 200
 
 @app.route('/api/chat/getupdate', methods=['POST'])
 @cross_origin()

@@ -8,11 +8,11 @@ Content-Type: application/json
 {"name": "Alice","postId": 1, "userID":2,"content": "yoooooo", "pwHash":"73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="
 }
 
-HTTP/1.1 200  - OK
-server: Werkzeug/2.2.2 Python/3.9.5
-date: Mon, 17 Apr 2023 01:58:29 GMT
-content-type: application/json
-content-length: 14
+HTTP/1.1 500  - INTERNAL SERVER ERROR
+server: Werkzeug/2.3.4 Python/3.10.6
+date: Sun, 14 May 2023 09:24:10 GMT
+content-type: text/html; charset=utf-8
+content-length: 265
 access-control-allow-origin: *
 connection: close
 ###
@@ -22,11 +22,11 @@ Content-Type: application/json
 {"name": "Alice","postId": 1, "userID":2,"content": "yoooooo", "pwHash":"73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="
 }
 
-HTTP/1.1 200  - OK
-server: Werkzeug/2.2.2 Python/3.9.5
-date: Mon, 17 Apr 2023 01:58:35 GMT
-content-type: application/json
-content-length: 323
+HTTP/1.1 500  - INTERNAL SERVER ERROR
+server: Werkzeug/2.3.4 Python/3.10.6
+date: Sun, 14 May 2023 09:24:10 GMT
+content-type: text/html; charset=utf-8
+content-length: 265
 access-control-allow-origin: *
 connection: close
 ###
@@ -35,11 +35,11 @@ Content-Type: application/json
 
 {"name": "Alice","pwHash": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="}
 
-HTTP/1.1 200  - OK
-server: Werkzeug/2.2.2 Python/3.9.5
-date: Mon, 17 Apr 2023 00:33:55 GMT
-content-type: application/json
-content-length: 16
+HTTP/1.1 500  - INTERNAL SERVER ERROR
+server: Werkzeug/2.3.4 Python/3.10.6
+date: Sun, 14 May 2023 09:24:11 GMT
+content-type: text/html; charset=utf-8
+content-length: 265
 access-control-allow-origin: *
 connection: close
 ###
@@ -49,9 +49,19 @@ Content-Type: application/json
 {"name": "Alice","pwHash": "73l8gRjwLftklgfdXT+MdiMEjJwGPVMsyVxe16iYpk8="}
 
 HTTP/1.1 200  - OK
-server: Werkzeug/2.2.2 Python/3.9.5
-date: Mon, 17 Apr 2023 01:57:48 GMT
+server: Werkzeug/2.3.4 Python/3.10.6
+date: Sun, 14 May 2023 12:42:20 GMT
 content-type: application/json
-content-length: 270
+content-length: 101
+access-control-allow-origin: *
+connection: close
+###
+GET http://localhost:5000/api/users
+
+HTTP/1.1 200  - OK
+server: Werkzeug/2.3.4 Python/3.10.6
+date: Sun, 14 May 2023 12:29:03 GMT
+content-type: application/json
+content-length: 257
 access-control-allow-origin: *
 connection: close
