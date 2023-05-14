@@ -10,6 +10,12 @@ endpoint = "https://comp3334nosqldb.documents.azure.com:443/"
 DATABASE_NAME = "comp3334DB"
 CONTAINER_NAME = "container1"
 
+credential = DefaultAzureCredential()
+client = CosmosClient(url=endpoint, credential=credential)
+
+dataBase = client.get_database_client(DATABASE_NAME)
+container = dataBase.get_container_client(CONTAINER_NAME)
+
 # Client IPDict
 IPDict = {}
 
@@ -21,7 +27,16 @@ app.config.update(
 )
 
 def checkpassword(name, password):
-    conn = get_db_connection()
+    
+    QUERY = "SELECT * FROM container1 p WHERE p.name = @name"
+    NAME = "Sam"
+    params = [dict(name="@name", value=NAME)]
+
+    results = container.query_items(
+        query=QUERY, parameters=params, enable_cross_partition_query=False
+    )
+    return results
+
     sql_select_query = """select * from users where name = ?"""
     user = conn.execute(sql_select_query, (name,)).fetchone()
     conn.close()
@@ -54,20 +69,12 @@ def main():
 @app.route('/api/users')
 @cross_origin()
 def get_users():
-    try:
-        credential = DefaultAzureCredential()
-        client = CosmosClient(url=endpoint, credential=credential)
-
-        dataBase = client.get_database_client(DATABASE_NAME)
-        container = dataBase.get_container_client(CONTAINER_NAME)
-
-        existing_item = container.read_item(
-            item="001",
-            partition_key="001",
-        )
-        return jsonify(existing_item), 200
-    except:
-        return "Error", 200
+    # https://learn.microsoft.com/en-us/azure/cosmos-db/nosql/quickstart-python?tabs=azure-portal%2Cpasswordless%2Clinux%2Csign-in-azure-cli%2Csync#get-an-item
+    existing_item = container.read_item(
+        item="001",
+        partition_key="001",
+    )
+    return jsonify(existing_item), 200
 
 @app.route('/api/signup', methods=['POST'])
 @cross_origin()
