@@ -7,7 +7,12 @@ Used technologies:
 
 Frontend: Vue.js
 
-Backend: Python flask
+Backend: Python flask, Azure web service with azure cosmos db
+
+### If you want to test the backend locally, you need to install and login to the Azure cli
+Please check out the method below for azure cli guide
+<https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt>
+
 
 ## Project setup to run the backend application locally
 
