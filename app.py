@@ -1,7 +1,9 @@
 import json
 from datetime import datetime, timedelta
-from flask import Flask,request,jsonify
+from flask import Flask,request,jsonify, session
 from flask_cors import CORS, cross_origin
+from flask_socketio import emit, join_room, leave_room, SocketIO
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from azure.cosmos import CosmosClient
 from azure.identity import DefaultAzureCredential
@@ -26,6 +28,16 @@ app.config.update(
     DEBUG=True,
     CORS_HEADERS='Content-Type',
 )
+socketio = SocketIO(app, cors_allowed_origins="*", engineio_logger=True)
+
+
+@socketio.on('joined')
+def joined(message):
+    """Sent by clients when they enter a room.
+    A status message is broadcast to all people in the room."""
+    room = session.get('room')
+    join_room(room)
+    emit('status', {'msg': session.get('name') + ' has entered the room.'}, room=room)
 
 def checkpassword(name, password):
 
@@ -35,8 +47,6 @@ def checkpassword(name, password):
         enable_cross_partition_query=True
     )
     items = [item for item in results]
-    # userlist = json.dumps(items, indent=True)
-    # print("Result list\n", userlist)
 
     if len(items) == 0:
         json_data = {"isvalid":False,"from client": request.remote_addr,
@@ -44,18 +54,7 @@ def checkpassword(name, password):
                         "status": "User not exist in database!"}
         return json_data
     
-    return items
-
-    # code to old DB be discontinued
-    sql_select_query = """select * from users where name = ?"""
-    user = conn.execute(sql_select_query, (name,)).fetchone()
-    conn.close()
-
-    if user is None:
-        json_data = {"isvalid":False,"from client": request.remote_addr,
-                        "attempt count": IPDict[request.remote_addr][0],
-                        "status": "User not exist in database!"}
-        return json_data
+    user = items[0]
 
     hashedpw = user.get('pwHash')
     if check_password_hash(hashedpw, password):
@@ -91,10 +90,14 @@ def get_users():
 def signup():
     json_data = request.get_json()
 
-    conn = get_db_connection()
-    sql_select_query = """select * from users where name = ?"""
-    res = conn.execute(sql_select_query, (json_data['name'],)).fetchone()
-    if res is not None:
+    results = container.query_items(
+        query="SELECT * FROM c WHERE c.name = @name", 
+        parameters=[dict(name="@name", value=json_data['name'])], 
+        enable_cross_partition_query=True
+    )
+    items = [item for item in results]
+
+    if len(items) != 0:
         json_data = {
             "signup":False, 
             "status": "User alreafy exist in database!"
@@ -104,12 +107,14 @@ def signup():
     # TO-DO: email verify
 
     hash = generate_password_hash(json_data['pwHash'])
-    conn.execute("INSERT INTO users (name, pwHash, confirmed) VALUES (?, ?, ?)",
-                (json_data['name'], hash, 0)
-                )
-    conn.commit()
-    conn.close()
-
+    parameters = {
+        "id": json_data['name'], 
+        "name": json_data['name'],
+        "pwHash": hash,
+        "confirmed": 0
+    }
+    userProxy = dataBase.create_user(parameters)
+    
     json_data = {"signup":True}
     return jsonify(json_data), 200
 
@@ -196,28 +201,6 @@ def changePassword():
     json_data = {
         "isvalid":True, "from client": request.remote_addr,
         "User info": user}
-    return jsonify(json_data), 200
-
-@app.route('/api/account/deleteAccount', methods=['POST'])
-@cross_origin()
-def deleteAccount():
-    json_data = request.get_json()
-
-    requestContent = checkpassword(json_data['name'], json_data['pwHash'])
-    if requestContent['isvalid'] == False:
-        return requestContent, 200
-
-    conn = get_db_connection()
-    conn.execute("DELETE FROM users WHERE id=?",
-                (json_data['userID'],)
-                )
-    conn.commit()
-    conn.close()
-    
-    json_data = {
-        "isvalid":True, "from client": request.remote_addr,
-        "User info": "account deleted"
-        }
     return jsonify(json_data), 200
 
 if __name__ == "__main__":
