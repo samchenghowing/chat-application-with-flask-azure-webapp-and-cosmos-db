@@ -1,5 +1,3 @@
-# COMP3334
-
 Here is the showcase of the frontend:
 <https://samchenghowing.github.io/COMP3334/#/>
 
