@@ -6,19 +6,33 @@
           <h1>
             Chat Room {{chatRoom}}          
             <v-btn
-              @click="dialog = true"
+              @click="leftRoom"
             >
               Change chat room
             </v-btn>
           </h1>
 
-          <div class="message" v-for="message in messages" :key="message.sent">
-            <v-card
-              :title=message.name
-              :subtitle=message.sent
-              :text=message.content
-            ></v-card>
+          <div v-if="messages.length === 0">
+            <h2>No messages yet... be the one to start!</h2>
           </div>
+          <div v-else>
+            <v-timeline align="start" density="compact">
+              <v-timeline-item
+                v-for="message in messages"
+                :key="message.time"
+                :dot-color="message.color"
+                size="x-small"
+              >
+                <div class="mb-4">
+                  <div class="font-weight-normal">
+                    <strong>{{ message.name }}</strong> @{{ message.time }}
+                  </div>
+                  <div>{{ message.content }}</div>
+                </div>
+              </v-timeline-item>
+            </v-timeline>
+          </div>
+
           <v-text-field
             v-model="messageText"
             clearable
@@ -65,7 +79,7 @@
             <v-btn
               v-model="confirmButton"
               :disabled="!items.length"
-              @click="dialog = false"
+              @click="joinRoom"
             >
               Confirm
             </v-btn>
@@ -77,26 +91,73 @@
 </template>
 
 <script>
+import io from "socket.io-client";
+
 export default {
-  mounted() {
-    this.timer = setInterval(() => {
-      this.getUpdate()
-    }, 2000)
-  },
   name: "ChatPage",
   data() {
     return {
-      timer: null,
-      postID: 1,
       user: "",
-      messages: null,
+      messages: [],
       messageText: "",
       dialog: true,
       items: [1, 2, 3],
-      chatRoom: [],
+      chatRoom: 1,
+      socket: io(process.env.VUE_APP_CHAT_URL),
     };
   },
+  created() {
+    this.socket.on('message', (data) => {
+      var message = data["msg"]["msg"]
+      var obj = JSON.parse(message)
+      this.messages.push(obj)
+    })
+
+    // TO-DO
+    // this.socket.on('status', (data) => {})
+  },
   methods: {
+    joinRoom(){
+      var obj = JSON.parse(sessionStorage.user)
+      var name = obj["User info"]["name"]
+      var userID = obj["User info"]["id"]
+      var pwHash = obj["User info"]["pwHash"]
+      var currentDate = new Date()
+
+      this.socket.emit('joined', {
+        msg: JSON.stringify({ 
+          room: this.chatRoom,
+          userID: userID,
+          name: name,
+          pwHash: pwHash,
+          content: "joined",
+          time: currentDate,
+        })
+      })
+      this.dialog = false
+    },
+
+    leftRoom(){
+      var obj = JSON.parse(sessionStorage.user)
+      var name = obj["User info"]["name"]
+      var userID = obj["User info"]["id"]
+      var pwHash = obj["User info"]["pwHash"]
+      var currentDate = new Date()
+
+      // left current room first
+      this.socket.emit('left', {
+        msg: JSON.stringify({ 
+          room: this.chatRoom,
+          userID: userID,
+          name: name,
+          pwHash: pwHash,
+          content: "joined",
+          time: currentDate,
+        })
+      })
+      this.dialog = true
+    },
+
     sendMessage() {
       if (this.messageText.trim() === "") {
         return;
@@ -105,55 +166,20 @@ export default {
       var name = obj["User info"]["name"]
       var userID = obj["User info"]["id"]
       var pwHash = obj["User info"]["pwHash"]
+      var currentDate = new Date()
 
-      var updateAPI = process.env.VUE_APP_API_URL + "/chat/send"
-      fetch(updateAPI, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          postId: this.postID,
+      this.socket.emit('text', {
+        msg: JSON.stringify({ 
+          room: this.chatRoom,
           userID: userID,
           name: name,
           pwHash: pwHash,
           content: this.messageText,
+          time: currentDate,
         })
-      })
-      .then((response) => response.json())
-      .then((post) => {
-        this.getUpdate()
-      })
-    },
-
-    getUpdate(){
-      var updateAPI = process.env.VUE_APP_API_URL + "/chat/getupdate"
-      var obj = JSON.parse(sessionStorage.user)
-      var name = obj["User info"]["name"]
-      var userID = obj["User info"]["id"]
-      var pwHash = obj["User info"]["pwHash"]
-      this.postID = this.chatRoom
-
-      fetch(updateAPI, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          postId: this.postID,
-          userID: userID,
-          name: name,
-          pwHash: pwHash,
-        })
-      })
-      .then((response) => response.json())
-      .then((post) => {
-        this.messages = post
-        var obj = JSON.parse(sessionStorage.user)
-        var name = obj["User info"]["name"]
-        this.user = name
-      })
+      });
     },
   },
-  beforeDestroy() {
-    clearInterval(this.timer)
-  }
 };
 </script>
   

@@ -24,20 +24,8 @@ IPDict = {}
 
 app = Flask(__name__)
 cors = CORS(app)
-app.config.update(
-    DEBUG=True,
-    CORS_HEADERS='Content-Type',
-)
+app.config.update(DEBUG=True, CORS_HEADERS='Content-Type')
 socketio = SocketIO(app, cors_allowed_origins="*", engineio_logger=True)
-
-
-@socketio.on('joined')
-def joined(message):
-    """Sent by clients when they enter a room.
-    A status message is broadcast to all people in the room."""
-    room = session.get('room')
-    join_room(room)
-    emit('status', {'msg': session.get('name') + ' has entered the room.'}, room=room)
 
 def checkpassword(name, password):
 
@@ -113,7 +101,7 @@ def signup():
         "pwHash": hash,
         "confirmed": 0
     }
-    userProxy = dataBase.create_user(parameters)
+    container.create_item(parameters)
     
     json_data = {"signup":True}
     return jsonify(json_data), 200
@@ -121,7 +109,6 @@ def signup():
 @app.route('/api/login', methods=['POST'])
 @cross_origin()
 def login():
-
     # check if brute force trying password to login
     if request.remote_addr not in IPDict:
         IPDict[request.remote_addr] = [0, datetime.now()]
@@ -144,64 +131,32 @@ def login():
     json_response = checkpassword(json_data['name'], json_data['pwHash'])
     return json_response, 200
 
-@app.route('/api/chat/getupdate', methods=['POST'])
-@cross_origin()
-def getupdate():
-    json_data = request.get_json()
+@socketio.on('joined', namespace='/chat')
+def joined(message):
+    """Sent by clients when they enter a room.
+    A status message is broadcast to all people in the room."""
+    data_dict = json.loads(message["msg"])
+    room = int(data_dict["room"])
+    join_room(room)
+    emit('status', {'msg': data_dict["name"] + ' has entered the room.'}, room=room)
 
-    isVaildRequest = checkpassword(json_data['name'], json_data['pwHash'])
-    if isVaildRequest['isvalid'] == False:
-        return isVaildRequest, 200
+@socketio.on('text', namespace='/chat')
+def text(message):
+    """Sent by a client when the user entered a new message.
+    The message is sent to all people in the room."""
+    data_dict = json.loads(message["msg"])
+    room = int(data_dict["room"])
+    emit('message', {'msg': message}, room=room)
 
-    conn = get_db_connection()
-    sql_select_query = """select * from chat where postId = ?"""
-    chats = conn.execute(sql_select_query, (json_data['postId'],)).fetchall()
-    conn.close()
+@socketio.on('left', namespace='/chat')
+def left(message):
+    """Sent by clients when they leave a room.
+    A status message is broadcast to all people in the room."""
+    data_dict = json.loads(message["msg"])
+    room = int(data_dict["room"])
+    leave_room(room)
+    emit('status', {'msg': data_dict["name"] + ' has left the room.'}, room=room)
 
-    return chats, 200
-
-@app.route('/api/chat/send', methods=['POST'])
-@cross_origin()
-def chat():
-    json_data = request.get_json()
-
-    isVaildRequest = checkpassword(json_data['name'], json_data['pwHash'])
-    if isVaildRequest['isvalid'] == False:
-        return isVaildRequest, 200
-
-    conn = get_db_connection()
-    conn.execute("INSERT INTO chat (postId, userId, name, content) VALUES (?,?,?,?)",
-                (json_data['postId'], json_data['userID'], json_data['name'], json_data['content'])
-                )
-    conn.commit()
-    conn.close()
-    
-    return jsonify({"send":True}), 200
-
-@app.route('/api/account/updateProfile', methods=['POST'])
-@cross_origin()
-def changePassword():
-    json_data = request.get_json()
-    
-    isVaildRequest = checkpassword(json_data['name'], json_data['oldpwHash'])
-    if isVaildRequest['isvalid'] == False:
-        return isVaildRequest, 200
-
-    hash = generate_password_hash(json_data['newpwHash'])
-    conn = get_db_connection()
-    conn.execute("UPDATE users SET name=?, email=?, pwHash=? WHERE id=?",
-                (json_data['newname'], json_data['newemail'], hash, json_data['userID'])
-                )
-    conn.commit()
-    sql_select_query = """select * from users where name = ?"""
-    user = conn.execute(sql_select_query, (json_data['name'],)).fetchone()
-    conn.close()
-    
-    user["pwHash"] = json_data['newpwHash']
-    json_data = {
-        "isvalid":True, "from client": request.remote_addr,
-        "User info": user}
-    return jsonify(json_data), 200
 
 if __name__ == "__main__":
     app.run()

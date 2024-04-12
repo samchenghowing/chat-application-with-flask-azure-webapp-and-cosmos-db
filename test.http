@@ -35,11 +35,11 @@ Content-Type: application/json
 
 {"name": "Sam","pwHash": "12345"}
 
-HTTP/1.1 500  - INTERNAL SERVER ERROR
+HTTP/1.1 200  - OK
 server: Werkzeug/2.3.4 Python/3.11.5
-date: Wed, 10 Apr 2024 03:34:32 GMT
-content-type: text/html; charset=utf-8
-content-length: 265
+date: Thu, 11 Apr 2024 04:33:37 GMT
+content-type: application/json
+content-length: 16
 access-control-allow-origin: *
 connection: close
 ###
