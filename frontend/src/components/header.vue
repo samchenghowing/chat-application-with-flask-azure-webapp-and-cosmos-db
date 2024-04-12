@@ -7,7 +7,7 @@
         >
         <v-app-bar-nav-icon v-on:click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
-        <v-app-bar-title>COMP3334</v-app-bar-title>
+        <v-app-bar-title>My chat</v-app-bar-title>
 
         <template v-slot:append>
             <v-btn icon="mdi-dots-vertical" v-on:click="showSetting"></v-btn>

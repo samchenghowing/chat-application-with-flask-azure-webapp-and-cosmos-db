@@ -1,15 +1,11 @@
-Here is the showcase of the frontend:
-<https://samchenghowing.github.io/COMP3334/#/>
-
-Used technologies:
+### Update Apr 2024:
+## This app have intergrated the idea from:
+<https://github.com/miguelgrinberg/Flask-SocketIO-Chat>
+please visit his page and supports him!
 
 Frontend: Vue.js
 
 Backend: Python flask, Azure web service with azure cosmos db
-
-### Update Apr 2024: 
-## This app have intergrated the idea from:<https://github.com/miguelgrinberg/Flask-SocketIO-Chat>
-please visit his page and supports him!
 
 ### If you want to test the backend locally, you need to install and login to the Azure cli
 Please check out the method below for azure cli guide
